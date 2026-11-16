@@ -1,6 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { X, Mail, Copy, Check, ExternalLink, Info } from 'lucide-react';
+import {
+  X,
+  Send,
+  Loader2,
+  Copy,
+  Check,
+  CheckCircle2,
+  AlertCircle,
+  Info,
+} from 'lucide-react';
 import {
   MODAL_OVERLAY_VARIANTS,
   MODAL_PANEL_VARIANTS,
@@ -9,19 +18,24 @@ import { useModalAccessibility } from '../../hooks/useModalAccessibility.js';
 import { SITE_CONFIG } from '../../data/portfolioData.js';
 import { submitContactInquiry } from '../../utils/contactService.js';
 
+const INITIAL_FORM_STATE = {
+  name: '',
+  email: '',
+  subject: '',
+  message: '',
+  _gotcha: '', // Hidden honeypot field for spam protection
+};
+
 export default function ContactModal({ isOpen, onClose }) {
   const prefersReducedMotion = useReducedMotion();
   const nameInputRef = useRef(null);
+  const submittingLockRef = useRef(false);
 
-  const [contactForm, setContactForm] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
-  const [statusMessage, setStatusMessage] = useState(null); // { type: 'mailto' | 'copied' | 'error' | 'endpoint', text: string }
+  const [contactForm, setContactForm] = useState(INITIAL_FORM_STATE);
+  // submissionState: 'idle' | 'loading' | 'success' | 'error'
+  const [submissionState, setSubmissionState] = useState('idle');
+  const [feedbackMessage, setFeedbackMessage] = useState('');
   const [copiedState, setCopiedState] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const panelRef = useModalAccessibility({
     isOpen,
@@ -29,12 +43,12 @@ export default function ContactModal({ isOpen, onClose }) {
     initialFocusRef: nameInputRef,
   });
 
-  // Reset transient feedback when modal closes
+  // Reset transient status banners when modal closes (preserve unsent draft text if not sent)
   useEffect(() => {
     if (!isOpen) {
-      setStatusMessage(null);
       setCopiedState(false);
-      setIsSubmitting(false);
+      submittingLockRef.current = false;
+      setSubmissionState((prev) => (prev === 'loading' ? 'idle' : prev));
     }
   }, [isOpen]);
 
@@ -46,53 +60,57 @@ export default function ContactModal({ isOpen, onClose }) {
     try {
       await navigator.clipboard.writeText(textToCopy);
       setCopiedState(true);
-      setStatusMessage({
-        type: 'copied',
-        text: configuredEmail
-          ? `Copied "${configuredEmail}" to clipboard. Paste it into your email client to send a message.`
-          : `Copied placeholder (${SITE_CONFIG.contactEmailPlaceholder}). Configure VITE_CONTACT_EMAIL in .env with your verified email address.`,
-      });
       setTimeout(() => setCopiedState(false), 3000);
     } catch {
-      setStatusMessage({
-        type: 'error',
-        text: `Unable to access clipboard automatically. Please copy manually: ${displayEmail}`,
-      });
+      setSubmissionState('error');
+      setFeedbackMessage(
+        `Unable to access clipboard automatically. Please copy manually: ${displayEmail}`,
+      );
+    }
+  };
+
+  const handleFieldChange = (field, value) => {
+    setContactForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+    if (submissionState === 'error' || submissionState === 'success') {
+      setSubmissionState('idle');
+      setFeedbackMessage('');
     }
   };
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    if (submittingLockRef.current || submissionState === 'loading') {
+      return;
+    }
+
+    submittingLockRef.current = true;
+    setSubmissionState('loading');
+    setFeedbackMessage('');
 
     try {
-      const result = await submitContactInquiry(contactForm);
-
-      if (result.mode === 'endpoint') {
-        setStatusMessage({
-          type: 'endpoint',
-          text: 'Your message was submitted to the configured endpoint.',
-        });
-        setContactForm({ name: '', email: '', subject: '', message: '' });
-      } else {
-        setStatusMessage({
-          type: 'mailto',
-          text: configuredEmail
-            ? `Your default email application has been opened with your prefilled message to ${configuredEmail}. Please click "Send" inside your email application to complete delivery.`
-            : 'Your default email application has been opened with your prefilled subject and message. Note: Configure VITE_CONTACT_EMAIL in .env so the recipient field is populated automatically, then send the email from your mail client.',
-        });
-      }
+      await submitContactInquiry(contactForm);
+      setSubmissionState('success');
+      setFeedbackMessage(
+        'Your message has been sent directly to my inbox. Thank you for reaching out—I will get back to you soon.',
+      );
+      // Clear the form only after confirmed successful submission
+      setContactForm(INITIAL_FORM_STATE);
     } catch (err) {
-      setStatusMessage({
-        type: 'error',
-        text:
-          err?.message ||
-          'Could not trigger email action. Please use the Copy Email Address button below.',
-      });
+      // Preserve visitor's entered form values on failure so they can retry
+      setSubmissionState('error');
+      setFeedbackMessage(
+        err?.message ||
+          'Something went wrong while sending your message. Please try again.',
+      );
     } finally {
-      setIsSubmitting(false);
+      submittingLockRef.current = false;
     }
   };
+
+  const isSubmitting = submissionState === 'loading';
 
   return (
     <AnimatePresence>
@@ -121,7 +139,7 @@ export default function ContactModal({ isOpen, onClose }) {
             {/* Header */}
             <div className="flex items-center justify-between px-5 sm:px-6 py-4 bg-[#101010] border-b border-[#33302D] font-mono text-xs shrink-0">
               <span id="contact-modal-title" className="text-[#E87935]">
-                CONTACT // JP.DEV
+                {'CONTACT // JP.DEV'}
               </span>
               <button
                 type="button"
@@ -135,7 +153,7 @@ export default function ContactModal({ isOpen, onClose }) {
 
             {/* Scrollable Body */}
             <div className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-5">
-              {/* Direct Email & Copy Fallback Strip */}
+              {/* Direct Email & Copy Strip */}
               <div className="p-3.5 bg-[#101010] border border-[#33302D] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="font-mono text-[10px] text-[#A7A19A] uppercase">
@@ -164,34 +182,69 @@ export default function ContactModal({ isOpen, onClose }) {
                 </button>
               </div>
 
-              {/* Honest Feedback Banner (Never claims fake delivery) */}
-              <AnimatePresence>
-                {statusMessage && (
+              {/* Submission Status Banner (Success / Error / Copied Notice) */}
+              <AnimatePresence mode="wait">
+                {submissionState === 'success' && (
                   <motion.div
+                    key="status-success"
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     role="status"
                     aria-live="polite"
-                    className={`p-3.5 border font-mono text-xs leading-relaxed flex items-start gap-3 ${
-                      statusMessage.type === 'error'
-                        ? 'bg-red-950/40 border-red-500/60 text-red-200'
-                        : 'bg-[#242220] border-[#E87935] text-[#E8E4DE]'
-                    }`}
+                    className="p-4 bg-[#242220] border border-[#E87935] font-mono text-xs leading-relaxed flex items-start gap-3"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-[#E87935] shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <div className="font-semibold text-[#E87935] uppercase text-[10px] tracking-wider">
+                        MESSAGE SENT
+                      </div>
+                      <p className="text-[#E8E4DE] text-[11px]">
+                        {feedbackMessage}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {submissionState === 'error' && feedbackMessage && (
+                  <motion.div
+                    key="status-error"
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    role="alert"
+                    aria-live="assertive"
+                    className="p-4 bg-[#242220] border border-red-500/70 font-mono text-xs leading-relaxed flex items-start gap-3"
+                  >
+                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <div className="font-semibold text-red-400 uppercase text-[10px] tracking-wider">
+                        SUBMISSION ERROR
+                      </div>
+                      <p className="text-[#E8E4DE] text-[11px]">
+                        {feedbackMessage}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {copiedState && submissionState === 'idle' && (
+                  <motion.div
+                    key="status-copied"
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    role="status"
+                    aria-live="polite"
+                    className="p-3.5 bg-[#242220] border border-[#E87935] font-mono text-xs leading-relaxed flex items-start gap-3"
                   >
                     <Info className="w-4 h-4 text-[#E87935] shrink-0 mt-0.5" />
                     <div className="space-y-1">
                       <div className="font-semibold text-[#F3A45B] uppercase text-[10px]">
-                        {statusMessage.type === 'mailto'
-                          ? 'EMAIL CLIENT LAUNCHED — MANUAL SEND REQUIRED'
-                          : statusMessage.type === 'copied'
-                          ? 'CLIPBOARD UPDATED'
-                          : statusMessage.type === 'endpoint'
-                          ? 'SUBMISSION COMPLETE'
-                          : 'NOTICE'}
+                        EMAIL COPIED TO CLIPBOARD
                       </div>
                       <p className="text-[#E8E4DE] text-[11px]">
-                        {statusMessage.text}
+                        {`Copied "${displayEmail}" to your clipboard.`}
                       </p>
                     </div>
                   </motion.div>
@@ -199,7 +252,33 @@ export default function ContactModal({ isOpen, onClose }) {
               </AnimatePresence>
 
               {/* Contact Form */}
-              <form onSubmit={handleContactSubmit} className="space-y-4">
+              <form
+                onSubmit={handleContactSubmit}
+                noValidate
+                className="space-y-4"
+              >
+                {/* Hidden Honeypot Field for Spam Protection */}
+                <div
+                  aria-hidden="true"
+                  className="hidden"
+                  style={{ display: 'none' }}
+                >
+                  <label htmlFor="contact-gotcha">
+                    Do not fill this field if you are human
+                  </label>
+                  <input
+                    id="contact-gotcha"
+                    name="_gotcha"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={contactForm._gotcha}
+                    onChange={(e) =>
+                      handleFieldChange('_gotcha', e.target.value)
+                    }
+                  />
+                </div>
+
                 <div>
                   <label
                     htmlFor="contact-name"
@@ -213,15 +292,11 @@ export default function ContactModal({ isOpen, onClose }) {
                     name="name"
                     type="text"
                     required
+                    disabled={isSubmitting}
                     value={contactForm.name}
-                    onChange={(e) =>
-                      setContactForm((prev) => ({
-                        ...prev,
-                        name: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => handleFieldChange('name', e.target.value)}
                     placeholder="Your name"
-                    className="w-full bg-[#101010] border border-[#33302D] focus:border-[#E87935] px-3.5 py-2.5 text-sm text-[#E8E4DE] placeholder:text-[#A7A19A]/40 focus:outline-none"
+                    className="w-full bg-[#101010] border border-[#33302D] focus:border-[#E87935] disabled:opacity-60 px-3.5 py-2.5 text-sm text-[#E8E4DE] placeholder:text-[#A7A19A]/40 focus:outline-none"
                   />
                 </div>
 
@@ -237,15 +312,11 @@ export default function ContactModal({ isOpen, onClose }) {
                     name="email"
                     type="email"
                     required
+                    disabled={isSubmitting}
                     value={contactForm.email}
-                    onChange={(e) =>
-                      setContactForm((prev) => ({
-                        ...prev,
-                        email: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => handleFieldChange('email', e.target.value)}
                     placeholder="your.email@example.com"
-                    className="w-full bg-[#101010] border border-[#33302D] focus:border-[#E87935] px-3.5 py-2.5 text-sm text-[#E8E4DE] placeholder:text-[#A7A19A]/40 focus:outline-none"
+                    className="w-full bg-[#101010] border border-[#33302D] focus:border-[#E87935] disabled:opacity-60 px-3.5 py-2.5 text-sm text-[#E8E4DE] placeholder:text-[#A7A19A]/40 focus:outline-none"
                   />
                 </div>
 
@@ -254,21 +325,20 @@ export default function ContactModal({ isOpen, onClose }) {
                     htmlFor="contact-subject"
                     className="block font-mono text-[11px] text-[#A7A19A] mb-1"
                   >
-                    SUBJECT <span className="text-[#A7A19A]/60">(OPTIONAL)</span>
+                    SUBJECT{' '}
+                    <span className="text-[#A7A19A]/60">(OPTIONAL)</span>
                   </label>
                   <input
                     id="contact-subject"
                     name="subject"
                     type="text"
+                    disabled={isSubmitting}
                     value={contactForm.subject}
                     onChange={(e) =>
-                      setContactForm((prev) => ({
-                        ...prev,
-                        subject: e.target.value,
-                      }))
+                      handleFieldChange('subject', e.target.value)
                     }
                     placeholder="Project inquiry or collaboration"
-                    className="w-full bg-[#101010] border border-[#33302D] focus:border-[#E87935] px-3.5 py-2.5 text-sm text-[#E8E4DE] placeholder:text-[#A7A19A]/40 focus:outline-none"
+                    className="w-full bg-[#101010] border border-[#33302D] focus:border-[#E87935] disabled:opacity-60 px-3.5 py-2.5 text-sm text-[#E8E4DE] placeholder:text-[#A7A19A]/40 focus:outline-none"
                   />
                 </div>
 
@@ -284,42 +354,51 @@ export default function ContactModal({ isOpen, onClose }) {
                     name="message"
                     rows={4}
                     required
+                    disabled={isSubmitting}
                     value={contactForm.message}
                     onChange={(e) =>
-                      setContactForm((prev) => ({
-                        ...prev,
-                        message: e.target.value,
-                      }))
+                      handleFieldChange('message', e.target.value)
                     }
                     placeholder="Tell me about your project, timeline, or role..."
-                    className="w-full bg-[#101010] border border-[#33302D] focus:border-[#E87935] px-3.5 py-2.5 text-sm text-[#E8E4DE] placeholder:text-[#A7A19A]/40 focus:outline-none"
+                    className="w-full bg-[#101010] border border-[#33302D] focus:border-[#E87935] disabled:opacity-60 px-3.5 py-2.5 text-sm text-[#E8E4DE] placeholder:text-[#A7A19A]/40 focus:outline-none"
                   />
                 </div>
-
-                <p className="font-mono text-[10px] text-[#A7A19A] leading-relaxed">
-                  Clicking <span className="text-[#E8E4DE]">Open in Email App</span>{' '}
-                  launches your default mail client with your subject and message
-                  prefilled so you can review and send it directly.
-                </p>
 
                 <div className="pt-2 flex flex-wrap items-center justify-end gap-3">
                   <button
                     type="button"
+                    disabled={isSubmitting}
                     onClick={onClose}
-                    className="px-4 py-2.5 border border-[#33302D] font-mono text-xs text-[#A7A19A] hover:text-[#E8E4DE] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
+                    className="px-4 py-2.5 border border-[#33302D] font-mono text-xs text-[#A7A19A] hover:text-[#E8E4DE] disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
                   >
                     Cancel
                   </button>
                   <motion.button
-                    whileHover={prefersReducedMotion ? undefined : { y: -2 }}
-                    whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+                    whileHover={
+                      prefersReducedMotion || isSubmitting
+                        ? undefined
+                        : { y: -2 }
+                    }
+                    whileTap={
+                      prefersReducedMotion || isSubmitting
+                        ? undefined
+                        : { scale: 0.98 }
+                    }
                     type="submit"
                     disabled={isSubmitting}
-                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#E87935] hover:bg-[#F3A45B] text-[#101010] font-mono text-xs font-semibold uppercase focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F3A45B]"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#E87935] hover:bg-[#F3A45B] disabled:opacity-70 disabled:cursor-not-allowed text-[#101010] font-mono text-xs font-semibold uppercase focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F3A45B]"
                   >
-                    <Mail className="w-3.5 h-3.5" />
-                    <span>Open in Email App</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>SENDING...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>SEND MESSAGE</span>
+                      </>
+                    )}
                   </motion.button>
                 </div>
               </form>
@@ -330,4 +409,3 @@ export default function ContactModal({ isOpen, onClose }) {
     </AnimatePresence>
   );
 }
-

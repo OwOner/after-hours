@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : 'https://YOUR_VERCEL_DOMAIN.vercel.app');
+      : 'https://jp-dev-info.vercel.app');
   const siteUrl = rawSiteUrl.replace(/\/+$/, '');
 
   return {

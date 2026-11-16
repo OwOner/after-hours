@@ -11,8 +11,8 @@ export const SITE_CONFIG = {
   // Verified contact email address
   contactEmail: import.meta.env.VITE_CONTACT_EMAIL || 'espanojohnpaul28@gmail.com',
   contactEmailPlaceholder: 'espanojohnpaul28@gmail.com',
-  // Optional future backend endpoint (e.g., Web3Forms / Formspree URL)
-  contactEndpoint: import.meta.env.VITE_CONTACT_ENDPOINT || '',
+  // Formspree submission endpoint (set VITE_FORMSPREE_ENDPOINT in .env / Vercel)
+  formspreeEndpoint: import.meta.env.VITE_FORMSPREE_ENDPOINT || '',
   // Verified social profile links (configure in .env or here when ready)
   githubUrl: import.meta.env.VITE_GITHUB_URL || '',
   linkedinUrl: import.meta.env.VITE_LINKEDIN_URL || '',
