@@ -6,159 +6,197 @@ import {
   Film,
   Radio,
 } from 'lucide-react';
-import {
-  PROJECTS,
-  EXPERTISE_CATEGORIES,
-  TIMELINE_DATA,
-  CREATIVE_WORKS,
-} from '../../data/portfolioData.js';
 
 /**
- * Maps each 3D Isometric Sector Structure to an ACTUAL existing portfolio
- * section ID on the page. All counts and summaries derive strictly from the
- * approved portfolio data.
+ * Reusable 5-Phase Cinematic Transition Timings (in milliseconds)
+ * - Phase A (Selection Lock):  0 - 120ms
+ * - Phase B (Impact Frame):    120 - 220ms
+ * - Phase C (Camera Punch-In): 220 - 700ms
+ * - Phase D (Transition Cut):  700 - 950ms
+ * - Phase E (Portfolio Arrival): 950ms
+ */
+export const TRANSITION_TIMINGS = {
+  lockDuration: 120,
+  impactDuration: 100,
+  punchDuration: 480,
+  cutDuration: 250,
+  reducedMotionTotal: 220,
+};
+
+/**
+ * Expanded 3D Isometric World Coordinates & Visitor-Friendly Destination Metadata
+ *
+ * All 6 destinations map to the exact existing portfolio section IDs while
+ * using clear, natural language for visitors, clients, and recruiters.
  */
 export const EXPLORATION_LOCATIONS = [
   {
     id: 'server-complex',
     sectionId: 'work',
-    code: 'SECTOR 01',
-    name: 'Server Complex',
-    sectionLabel: 'SELECTED WORK',
-    navShortLabel: 'PROJECTS',
+    code: '01',
+    categoryLabel: 'FEATURED PROJECTS',
+    name: 'My Projects',
+    sectionLabel: 'Selected Work',
+    navShortLabel: 'My Projects',
+    actionLabel: 'Explore Projects',
+    tagline: "View the software projects I've worked on.",
     archetype: 'server-complex',
     icon: Server,
-    // 3D World Coordinates (Isometric X, Y, Z in world units)
-    position: { x: -240, y: 0, z: -130 },
+    position: { x: -375, y: 0, z: -225 },
     accent: '#E87935',
     secondaryAccent: '#F3A45B',
-    portalTitle: 'SELECTED WORK // SYSTEMS',
     summary:
-      'Flagship applications and systems built with Next.js, Electron, React, TypeScript, Supabase, and SQLite.',
-    highlights: PROJECTS.map((p) => `${p.title} (${p.tier})`),
-    metaBadge: `${PROJECTS.length} FEATURED SYSTEMS`,
+      "Take a closer look at the software applications and digital solutions I've worked on.",
+    highlights: [
+      'Nexus Payroll — Enterprise payroll management system',
+      'Universal POS — Desktop point-of-sale application',
+      'SmartSpend — Personal expense tracking application',
+    ],
   },
   {
     id: 'technology-core',
     sectionId: 'expertise',
-    code: 'SECTOR 02',
-    name: 'Technology Core',
-    sectionLabel: 'TOOLS OF THE TRADE',
-    navShortLabel: 'EXPERTISE',
+    code: '02',
+    categoryLabel: 'SKILLS & TECHNOLOGIES',
+    name: 'My Skills',
+    sectionLabel: 'Tools of the Trade',
+    navShortLabel: 'My Skills',
+    actionLabel: 'Explore Skills',
+    tagline: 'Explore the technologies and tools I use.',
     archetype: 'tech-core',
     icon: Cpu,
-    position: { x: 40, y: 0, z: -240 },
+    position: { x: 185, y: 0, z: -385 },
     accent: '#E87935',
     secondaryAccent: '#38BDF8',
-    portalTitle: 'TECHNICAL CAPABILITIES',
     summary:
-      'Interactive architectural matrix spanning Frontend, Backend, Database, Programming Languages, and Tools.',
-    highlights: EXPERTISE_CATEGORIES.map(
-      (c) => `${c.label} (${c.items.length} tools)`,
-    ),
-    metaBadge: `${EXPERTISE_CATEGORIES.length} CORE DOMAINS`,
+      'Explore the programming languages, frameworks, databases, and tools I use to build software applications.',
+    highlights: [
+      'Frontend and backend web development frameworks',
+      'Cloud and local relational database systems',
+      'Programming languages and development tools',
+    ],
   },
   {
     id: 'developer-terminal',
     sectionId: 'about',
-    code: 'SECTOR 03',
-    name: 'Developer Terminal',
-    sectionLabel: 'BEHIND THE CODE',
-    navShortLabel: 'ABOUT',
+    code: '03',
+    categoryLabel: 'DEVELOPER PROFILE',
+    name: 'About Me',
+    sectionLabel: 'Behind the Code',
+    navShortLabel: 'About Me',
+    actionLabel: 'Explore About Me',
+    tagline: 'Learn more about my background.',
     archetype: 'developer-terminal',
     icon: Terminal,
-    position: { x: 250, y: 0, z: -90 },
+    position: { x: 415, y: 0, z: 20 },
     accent: '#F3A45B',
     secondaryAccent: '#E87935',
-    portalTitle: 'DEVELOPER PROFILE',
     summary:
-      'Software & Multimedia Developer based in Sorsogon, Philippines focused on web, desktop, and digital product workflows.',
+      'Learn more about my background, interests, and approach to software development.',
     highlights: [
-      'Location: Sorsogon, Philippines',
-      'Field: Software Development',
-      'Focus: Software Engineering, UI/UX, Digital Creativity',
+      'Based in Sorsogon, Philippines',
+      'Focused on web and desktop software development',
+      'Interests in software engineering, UI/UX, and digital creativity',
     ],
-    metaBadge: 'PROFILE // SORSOGON, PH',
   },
   {
     id: 'operations-center',
     sectionId: 'experience',
-    code: 'SECTOR 04',
-    name: 'Operations Center',
-    sectionLabel: 'EXPERIENCE & BACKGROUND',
-    navShortLabel: 'EXPERIENCE',
+    code: '04',
+    categoryLabel: 'BACKGROUND & TIMELINE',
+    name: 'My Experience',
+    sectionLabel: 'Experience & Background',
+    navShortLabel: 'My Experience',
+    actionLabel: 'Explore Experience',
+    tagline: 'Discover my professional and creative experience.',
     archetype: 'operations-center',
     icon: Briefcase,
-    position: { x: 220, y: 0, z: 165 },
+    position: { x: 205, y: 0, z: 345 },
     accent: '#E87935',
     secondaryAccent: '#F3A45B',
-    portalTitle: 'EXPERIENCE & BACKGROUND',
     summary:
-      'Core software engineering practice, multimedia production capabilities, and computing studies foundation.',
-    highlights: TIMELINE_DATA.map((t) => `${t.period}: ${t.role}`),
-    metaBadge: `${TIMELINE_DATA.length} BACKGROUND PILLARS`,
+      'Discover my professional and creative experience across software development, digital media, and computing studies.',
+    highlights: [
+      'Web and desktop application development practice',
+      'Video editing and digital content workflows',
+      'Software engineering and computing foundation',
+    ],
   },
   {
     id: 'media-station',
     sectionId: 'creative',
-    code: 'SECTOR 05',
-    name: 'Media Station',
-    sectionLabel: 'BEYOND DEVELOPMENT',
-    navShortLabel: 'CREATIVE',
+    code: '05',
+    categoryLabel: 'VIDEO & DIGITAL MEDIA',
+    name: 'Creative Work',
+    sectionLabel: 'Beyond Development',
+    navShortLabel: 'Creative Work',
+    actionLabel: 'Explore Creative Work',
+    tagline: 'Explore my video editing and multimedia work.',
     archetype: 'media-station',
     icon: Film,
-    position: { x: -45, y: 0, z: 245 },
+    position: { x: -165, y: 0, z: 385 },
     accent: '#F3A45B',
     secondaryAccent: '#38BDF8',
-    portalTitle: 'CREATIVE & DIGITAL MEDIA',
     summary:
-      'Secondary capability screening room for promotional video editing, digital ad cuts, and content workflows.',
-    highlights: CREATIVE_WORKS.map((w) => `Reel ${w.id}: ${w.title}`),
-    metaBadge: `${CREATIVE_WORKS.length} MEDIA REEL SLOTS`,
+      'Explore my video editing, promotional media, and digital content work alongside my software projects.',
+    highlights: [
+      'Promotional product and commercial video edits',
+      'Digital campaign spots and social media content',
+      'Visual pacing and narrative montage samples',
+    ],
   },
   {
     id: 'communications-hub',
     sectionId: 'contact',
-    code: 'SECTOR 06',
-    name: 'Communications Hub',
-    sectionLabel: 'CONTACT & CHANNELS',
-    navShortLabel: 'CONTACT',
+    code: '06',
+    categoryLabel: 'GET IN TOUCH',
+    name: 'Contact Me',
+    sectionLabel: 'Contact',
+    navShortLabel: 'Contact Me',
+    actionLabel: 'Explore Contact',
+    tagline: 'Get in touch or connect with me.',
     archetype: 'comms-hub',
     icon: Radio,
-    position: { x: -255, y: 0, z: 125 },
+    position: { x: -415, y: 0, z: 50 },
     accent: '#E87935',
     secondaryAccent: '#38BDF8',
-    portalTitle: 'INITIATE CONTACT',
     summary:
-      'Direct workspace inquiry form, resume download, and professional GitHub & LinkedIn channels.',
+      'Get in touch for software development inquiries, project collaborations, or to download my resume.',
     highlights: [
-      'Direct Inquiry Form & Copy Email Action',
-      'Downloadable Resume PDF Slot',
-      'GitHub & LinkedIn Network Channels',
+      'Direct message form and copyable email address',
+      'Downloadable resume PDF',
+      'GitHub and LinkedIn profile channels',
     ],
-    metaBadge: 'OPEN FOR INQUIRIES',
   },
 ];
 
 /**
  * Pathways connecting the Central Core (0,0,0) to each sector platform
- * and linking adjacent sectors around the perimeter ring.
+ * via architectural relay waypoints, plus outer perimeter conduits.
  */
 export const EXPLORATION_PATHWAYS = [
-  // Radial core conduits
   ...EXPLORATION_LOCATIONS.map((loc) => ({
     id: `core-to-${loc.id}`,
     from: { x: 0, y: 0, z: 0 },
+    mid: {
+      x: Math.round(loc.position.x * 0.48),
+      y: 0,
+      z: Math.round(loc.position.z * 0.48),
+    },
     to: loc.position,
     targetId: loc.id,
     kind: 'core',
   })),
-  // Perimeter ring conduits
   ...EXPLORATION_LOCATIONS.map((loc, idx) => {
     const next = EXPLORATION_LOCATIONS[(idx + 1) % EXPLORATION_LOCATIONS.length];
     return {
       id: `ring-${loc.id}-${next.id}`,
       from: loc.position,
+      mid: {
+        x: Math.round((loc.position.x + next.position.x) * 0.5),
+        y: 0,
+        z: Math.round((loc.position.z + next.position.z) * 0.5),
+      },
       to: next.position,
       targetId: loc.id,
       secondaryTargetId: next.id,
@@ -169,8 +207,7 @@ export const EXPLORATION_PATHWAYS = [
 
 /**
  * Optional Web Audio API UI sound synthesizer.
- * Strictly OFF by default. Never autoplays. Only runs on user interaction
- * when the visitor explicitly enables "Sound Effects: ON" in the HUD.
+ * Strictly OFF by default. Never autoplays.
  */
 let sharedAudioCtx = null;
 
@@ -197,23 +234,31 @@ export function playExplorationSound(type, enabled) {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(520, now);
       osc.frequency.exponentialRampToValueAtTime(680, now + 0.055);
-      gain.gain.setValueAtTime(0.025, now);
+      gain.gain.setValueAtTime(0.02, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
       osc.start(now);
       osc.stop(now + 0.065);
+    } else if (type === 'focus') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(340, now);
+      osc.frequency.exponentialRampToValueAtTime(580, now + 0.14);
+      gain.gain.setValueAtTime(0.035, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+      osc.start(now);
+      osc.stop(now + 0.17);
     } else if (type === 'select') {
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
-      gain.gain.setValueAtTime(0.05, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(660, now + 0.26);
+      gain.gain.setValueAtTime(0.055, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
       osc.start(now);
-      osc.stop(now + 0.23);
+      osc.stop(now + 0.35);
     } else if (type === 'toggle') {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(380, now);
       osc.frequency.exponentialRampToValueAtTime(480, now + 0.08);
-      gain.gain.setValueAtTime(0.03, now);
+      gain.gain.setValueAtTime(0.025, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
       osc.start(now);
       osc.stop(now + 0.095);

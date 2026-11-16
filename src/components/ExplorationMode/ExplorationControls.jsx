@@ -9,13 +9,16 @@ import {
   Layers,
 } from 'lucide-react';
 
+const QUALITY_LABELS = {
+  AUTO: 'Auto',
+  HIGH: 'High',
+  LOW: 'Low',
+};
+
 /**
  * Bottom-Left Environment Settings & Camera Controls.
- * Every control genuinely modifies the live Exploration Mode behavior:
- * - Sound Effects: OFF by default; enables subtle Web Audio portal synthesis when ON.
- * - Visual Quality: AUTO -> HIGH -> LOW (adjusts canvas DPR, particle count, and grid detail).
- * - Motion: ON / REDUCED (toggles ambient rotation, particle drift, and pulse animations).
- * - Camera Zoom / Reset / 2D Tactical Fallback toggle.
+ * Uses clear, visitor-friendly labels (Zoom In, Zoom Out, Full Map, Map Grid,
+ * Sound Effects: Off, Visual Quality: Auto, Reduced Motion: Off).
  */
 export default function ExplorationControls({
   soundEnabled,
@@ -30,6 +33,8 @@ export default function ExplorationControls({
   onZoomOut,
   onResetCamera,
 }) {
+  const qualityDisplay = QUALITY_LABELS[visualQuality] || 'Auto';
+
   return (
     <div className="pointer-events-auto flex flex-col gap-2">
       {/* Camera & View Mode Controls */}
@@ -40,29 +45,31 @@ export default function ExplorationControls({
               type="button"
               onClick={onZoomIn}
               title="Zoom In"
-              aria-label="Zoom camera in"
-              className="p-2 bg-[#101010]/90 hover:bg-[#191919] border border-[#33302D] hover:border-[#E87935] text-[#A7A19A] hover:text-[#E8E4DE] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
+              aria-label="Zoom In"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#101010]/92 hover:bg-[#191919] border border-[#33302D] hover:border-[#E87935] font-mono text-xs text-[#B8B0A6] hover:text-[#E8E4DE] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
             >
-              <ZoomIn className="w-3.5 h-3.5" />
+              <ZoomIn className="w-3.5 h-3.5 text-[#E87935]" />
+              <span className="hidden md:inline">Zoom In</span>
             </button>
             <button
               type="button"
               onClick={onZoomOut}
               title="Zoom Out"
-              aria-label="Zoom camera out"
-              className="p-2 bg-[#101010]/90 hover:bg-[#191919] border border-[#33302D] hover:border-[#E87935] text-[#A7A19A] hover:text-[#E8E4DE] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
+              aria-label="Zoom Out"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#101010]/92 hover:bg-[#191919] border border-[#33302D] hover:border-[#E87935] font-mono text-xs text-[#B8B0A6] hover:text-[#E8E4DE] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
             >
-              <ZoomOut className="w-3.5 h-3.5" />
+              <ZoomOut className="w-3.5 h-3.5 text-[#E87935]" />
+              <span className="hidden md:inline">Zoom Out</span>
             </button>
             <button
               type="button"
               onClick={onResetCamera}
-              title="Reset Camera Overview"
-              aria-label="Reset camera overview"
-              className="inline-flex items-center gap-1.5 px-2.5 py-2 bg-[#101010]/90 hover:bg-[#191919] border border-[#33302D] hover:border-[#E87935] font-mono text-[10px] text-[#A7A19A] hover:text-[#E8E4DE] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
+              title="Reset to Full Map"
+              aria-label="Full Map"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#101010]/92 hover:bg-[#191919] border border-[#33302D] hover:border-[#E87935] font-mono text-xs text-[#B8B0A6] hover:text-[#E8E4DE] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
             >
-              <RotateCcw className="w-3 h-3 text-[#E87935]" />
-              <span className="hidden sm:inline">Overview</span>
+              <RotateCcw className="w-3.5 h-3.5 text-[#E87935]" />
+              <span>Full Map</span>
             </button>
           </>
         )}
@@ -71,50 +78,56 @@ export default function ExplorationControls({
           type="button"
           onClick={onToggleFallbackView}
           aria-pressed={isFallbackView}
-          className="inline-flex items-center gap-1.5 px-2.5 py-2 bg-[#101010]/90 hover:bg-[#191919] border border-[#33302D] hover:border-[#E87935] font-mono text-[10px] text-[#A7A19A] hover:text-[#E8E4DE] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
+          title={
+            isFallbackView ? 'Switch to 3D Map View' : 'Switch to Map Grid view'
+          }
+          className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#101010]/92 hover:bg-[#191919] border border-[#33302D] hover:border-[#E87935] font-mono text-xs text-[#B8B0A6] hover:text-[#E8E4DE] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
         >
-          <Layers className="w-3 h-3 text-[#E87935]" />
-          <span>{isFallbackView ? '3D Isometric View' : '2D Sector Grid'}</span>
+          <Layers className="w-3.5 h-3.5 text-[#E87935]" />
+          <span>{isFallbackView ? '3D Map View' : 'Map Grid'}</span>
         </button>
       </div>
 
-      {/* Environment Diagnostic Settings Strip */}
-      <div className="flex flex-wrap items-center gap-1.5 bg-[#101010]/90 backdrop-blur-md border border-[#33302D] p-1.5">
+      {/* Environment Settings Strip */}
+      <div className="flex flex-wrap items-center gap-1.5 bg-[#101010]/92 backdrop-blur-md border border-[#33302D] p-1.5">
         <button
           type="button"
           onClick={onToggleSound}
           aria-pressed={soundEnabled}
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10px] uppercase transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#E87935] ${
+          title="Toggle interface sound effects"
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-[11px] sm:text-xs transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#E87935] ${
             soundEnabled
               ? 'bg-[#242220] text-[#E8E4DE] border border-[#E87935]/60'
-              : 'bg-[#191919] text-[#A7A19A] hover:text-[#E8E4DE] border border-transparent'
+              : 'bg-[#191919] text-[#B8B0A6] hover:text-[#E8E4DE] border border-transparent'
           }`}
         >
           {soundEnabled ? (
-            <Volume2 className="w-3 h-3 text-[#E87935]" />
+            <Volume2 className="w-3.5 h-3.5 text-[#E87935]" />
           ) : (
-            <VolumeX className="w-3 h-3 text-[#A7A19A]" />
+            <VolumeX className="w-3.5 h-3.5 text-[#A7A19A]" />
           )}
-          <span>Sound: {soundEnabled ? 'ON' : 'OFF'}</span>
+          <span>Sound Effects: {soundEnabled ? 'On' : 'Off'}</span>
         </button>
 
         <button
           type="button"
           onClick={onCycleQuality}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#191919] hover:bg-[#242220] font-mono text-[10px] text-[#A7A19A] hover:text-[#E8E4DE] uppercase transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#E87935]"
+          title="Cycle visual rendering quality (Auto, High, Low)"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#191919] hover:bg-[#242220] font-mono text-[11px] sm:text-xs text-[#B8B0A6] hover:text-[#E8E4DE] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#E87935]"
         >
-          <Sparkles className="w-3 h-3 text-[#F3A45B]" />
-          <span>Quality: {visualQuality}</span>
+          <Sparkles className="w-3.5 h-3.5 text-[#F3A45B]" />
+          <span>Visual Quality: {qualityDisplay}</span>
         </button>
 
         <button
           type="button"
           onClick={onToggleMotion}
-          aria-pressed={!motionReduced}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#191919] hover:bg-[#242220] font-mono text-[10px] text-[#A7A19A] hover:text-[#E8E4DE] uppercase transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#E87935]"
+          aria-pressed={motionReduced}
+          title="Toggle reduced motion mode"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-[#191919] hover:bg-[#242220] font-mono text-[11px] sm:text-xs text-[#B8B0A6] hover:text-[#E8E4DE] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#E87935]"
         >
-          <Activity className="w-3 h-3 text-[#E87935]" />
-          <span>Motion: {motionReduced ? 'REDUCED' : 'ON'}</span>
+          <Activity className="w-3.5 h-3.5 text-[#E87935]" />
+          <span>Reduced Motion: {motionReduced ? 'On' : 'Off'}</span>
         </button>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { MOTION_TOKENS } from '../../utils/motion.jsx';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility.js';
 import {
   EXPLORATION_LOCATIONS,
+  TRANSITION_TIMINGS,
   playExplorationSound,
 } from './explorationData.js';
 import ExplorationHUD from './ExplorationHUD.jsx';
@@ -24,20 +25,27 @@ export default function ExplorationMode({
   const systemReducedMotion = useReducedMotion();
   const closeButtonRef = useRef(null);
   const savedScrollYRef = useRef(0);
-  const portalTimerRef = useRef(null);
+  const transitionTimersRef = useRef([]);
 
   // Environment & HUD State
   const [hoveredLocation, setHoveredLocation] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(
     EXPLORATION_LOCATIONS[0],
   );
-  const [isEntering, setIsEntering] = useState(false);
+  const [focusedLocationId, setFocusedLocationId] = useState(null);
+  const [transitionState, setTransitionState] = useState({
+    phase: 'idle', // 'idle' | 'lock' | 'impact' | 'punch' | 'cut'
+    phaseStartTime: 0,
+    phaseDuration: 0,
+  });
   const [quickNavOpen, setQuickNavOpen] = useState(false);
 
   // Bottom-Left Settings (Sound OFF by default, Quality AUTO, Motion synced with OS preference)
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [visualQuality, setVisualQuality] = useState('AUTO');
-  const [motionReduced, setMotionReduced] = useState(Boolean(systemReducedMotion));
+  const [motionReduced, setMotionReduced] = useState(
+    Boolean(systemReducedMotion),
+  );
   const [isFallbackView, setIsFallbackView] = useState(false);
 
   // Camera Command State
@@ -48,26 +56,34 @@ export default function ExplorationMode({
     setMotionReduced(Boolean(systemReducedMotion));
   }, [systemReducedMotion]);
 
+  const clearTransitionTimers = () => {
+    transitionTimersRef.current.forEach((id) => clearTimeout(id));
+    transitionTimersRef.current = [];
+  };
+
   useEffect(() => {
-    return () => {
-      if (portalTimerRef.current) clearTimeout(portalTimerRef.current);
-    };
+    return () => clearTransitionTimers();
   }, []);
+
+  const isEntering = transitionState.phase !== 'idle';
 
   // Save scroll position on open; restore on manual exit
   const handleOpenExploration = () => {
     if (typeof window !== 'undefined') {
       savedScrollYRef.current = window.scrollY;
     }
-    setIsEntering(false);
+    clearTransitionTimers();
+    setTransitionState({ phase: 'idle', phaseStartTime: 0, phaseDuration: 0 });
+    setFocusedLocationId(null);
     setQuickNavOpen(false);
     setCameraTarget({ mode: 'overview', ts: Date.now() });
     onOpen();
   };
 
   const handleExitExploration = () => {
-    if (portalTimerRef.current) clearTimeout(portalTimerRef.current);
-    setIsEntering(false);
+    clearTransitionTimers();
+    setTransitionState({ phase: 'idle', phaseStartTime: 0, phaseDuration: 0 });
+    setFocusedLocationId(null);
     setQuickNavOpen(false);
     onClose();
     if (typeof window !== 'undefined') {
@@ -85,6 +101,7 @@ export default function ExplorationMode({
   });
 
   const handleHoverLocation = (loc) => {
+    if (isEntering) return;
     if (loc && loc.id !== hoveredLocation?.id) {
       playExplorationSound('hover', soundEnabled);
     }
@@ -92,9 +109,10 @@ export default function ExplorationMode({
   };
 
   const handleFocusLocation = (loc) => {
-    if (!loc) return;
-    playExplorationSound('toggle', soundEnabled);
+    if (!loc || isEntering) return;
+    playExplorationSound('focus', soundEnabled);
     setSelectedLocation(loc);
+    setFocusedLocationId(loc.id);
     setCameraTarget({
       mode: 'focus',
       position: loc.position,
@@ -102,31 +120,111 @@ export default function ExplorationMode({
     });
   };
 
+  const handleResetOverview = () => {
+    if (isEntering) return;
+    playExplorationSound('toggle', soundEnabled);
+    setFocusedLocationId(null);
+    setCameraTarget({ mode: 'overview', ts: Date.now() });
+  };
+
+  /**
+   * Executes the 5-Phase Cinematic Transition Sequence (or a simple 220ms
+   * reduced-motion fade when motionReduced is enabled).
+   */
   const handleEnterPortal = (loc) => {
     if (!loc || isEntering) return;
+    clearTransitionTimers();
     playExplorationSound('select', soundEnabled);
     setSelectedLocation(loc);
+    setFocusedLocationId(loc.id);
     setQuickNavOpen(false);
-    setIsEntering(true);
-    setCameraTarget({
-      mode: 'focus',
-      position: loc.position,
-      ts: Date.now(),
+
+    if (motionReduced) {
+      setTransitionState({
+        phase: 'cut',
+        phaseStartTime: performance.now(),
+        phaseDuration: TRANSITION_TIMINGS.reducedMotionTotal,
+      });
+      setCameraTarget({
+        mode: 'focus',
+        position: loc.position,
+        ts: Date.now(),
+      });
+      const tEnd = setTimeout(() => {
+        setTransitionState({
+          phase: 'idle',
+          phaseStartTime: 0,
+          phaseDuration: 0,
+        });
+        onClose();
+        onNavigateToSection(loc.sectionId, true);
+      }, TRANSITION_TIMINGS.reducedMotionTotal);
+      transitionTimersRef.current.push(tEnd);
+      return;
+    }
+
+    const { lockDuration, impactDuration, punchDuration, cutDuration } =
+      TRANSITION_TIMINGS;
+
+    // Phase A — Selection Lock (0–120ms)
+    setTransitionState({
+      phase: 'lock',
+      phaseStartTime: performance.now(),
+      phaseDuration: lockDuration,
     });
 
-    const delayMs = motionReduced ? 120 : 480;
-    if (portalTimerRef.current) clearTimeout(portalTimerRef.current);
-    portalTimerRef.current = setTimeout(() => {
-      setIsEntering(false);
+    // Phase B — Impact Frame (120–220ms)
+    const tImpact = setTimeout(() => {
+      setTransitionState({
+        phase: 'impact',
+        phaseStartTime: performance.now(),
+        phaseDuration: impactDuration,
+      });
+    }, lockDuration);
+
+    // Phase C — Camera Punch-In (220–700ms)
+    const tPunch = setTimeout(() => {
+      setTransitionState({
+        phase: 'punch',
+        phaseStartTime: performance.now(),
+        phaseDuration: punchDuration,
+      });
+      setCameraTarget({
+        mode: 'punch',
+        position: loc.position,
+        ts: Date.now(),
+      });
+    }, lockDuration + impactDuration);
+
+    // Phase D — Transition Cut (700–950ms)
+    const tCut = setTimeout(() => {
+      setTransitionState({
+        phase: 'cut',
+        phaseStartTime: performance.now(),
+        phaseDuration: cutDuration,
+      });
+    }, lockDuration + impactDuration + punchDuration);
+
+    // Phase E — Portfolio Arrival (950ms)
+    const tArrival = setTimeout(() => {
+      setTransitionState({
+        phase: 'idle',
+        phaseStartTime: 0,
+        phaseDuration: 0,
+      });
+      setFocusedLocationId(null);
       onClose();
-      onNavigateToSection(loc.sectionId);
-    }, delayMs);
+      onNavigateToSection(loc.sectionId, true);
+    }, lockDuration + impactDuration + punchDuration + cutDuration);
+
+    transitionTimersRef.current.push(tImpact, tPunch, tCut, tArrival);
   };
 
   const handleCycleQuality = () => {
     playExplorationSound('toggle', soundEnabled);
     setVisualQuality((prev) => {
-      const nextIdx = (QUALITY_LEVELS.indexOf(prev) + 1) % QUALITY_LEVELS.length;
+      const nextIdx =
+        (QUALITY_LEVELS.indexOf(prev) + 1) % QUALITY_LEVELS.length;
       return QUALITY_LEVELS[nextIdx];
     });
   };
@@ -172,7 +270,7 @@ export default function ExplorationMode({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{
-              duration: motionReduced ? 0.05 : 0.32,
+              duration: motionReduced ? 0.05 : 0.3,
               ease: MOTION_TOKENS.ease,
             }}
             className="fixed inset-0 z-50 bg-[#0b0b0b] overflow-hidden"
@@ -191,7 +289,8 @@ export default function ExplorationMode({
               <LazyExplorationScene
                 hoveredLocation={hoveredLocation}
                 selectedLocation={selectedLocation}
-                isEntering={isEntering}
+                focusedLocationId={focusedLocationId}
+                transitionState={transitionState}
                 visualQuality={visualQuality}
                 motionReduced={motionReduced}
                 forceFallbackView={isFallbackView}
@@ -203,21 +302,42 @@ export default function ExplorationMode({
               />
             </Suspense>
 
-            {/* Portal Entry Transition Flash Overlay */}
+            {/* Phase D (700–950ms): Cinematic Orange-Tinted Portal Wipe & Tactical Destination Readout */}
             <AnimatePresence>
-              {isEntering && selectedLocation && (
+              {transitionState.phase === 'cut' && selectedLocation && (
                 <motion.div
+                  key="portal-transition-cut"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.28 }}
-                  className="pointer-events-none fixed inset-0 z-40 bg-[#101010]/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center"
+                  transition={{ duration: motionReduced ? 0.1 : 0.22 }}
+                  style={{
+                    background:
+                      'radial-gradient(circle at 50% 50%, rgba(232,121,53,0.28) 0%, rgba(16,16,16,0.96) 68%)',
+                  }}
+                  className="pointer-events-none fixed inset-0 z-40 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center"
                 >
-                  <div className="font-mono text-xs tracking-[0.25em] text-[#E87935] uppercase mb-2">
-                    PORTAL LINK ESTABLISHED // {selectedLocation.code}
-                  </div>
-                  <div className="font-heading text-2xl sm:text-4xl font-bold text-[#E8E4DE]">
-                    ENTERING {selectedLocation.sectionLabel}
+                  <div className="border border-[#E87935] bg-[#101010]/96 px-8 py-6 max-w-md w-full shadow-[0_0_60px_rgba(232,121,53,0.4)] space-y-2.5">
+                    <div className="font-mono text-xs tracking-widest text-[#E87935] uppercase">
+                      {selectedLocation.categoryLabel}
+                    </div>
+                    <div className="font-heading text-2xl sm:text-3xl font-bold text-[#E8E4DE] tracking-wide">
+                      {selectedLocation.name}
+                    </div>
+                    <div className="text-xs sm:text-sm text-[#B8B0A6] pt-1">
+                      Opening {selectedLocation.name}...
+                    </div>
+                    <div className="w-full h-1 bg-[#242220] overflow-hidden mt-3">
+                      <motion.div
+                        initial={{ width: '0%' }}
+                        animate={{ width: '100%' }}
+                        transition={{
+                          duration: motionReduced ? 0.12 : 0.23,
+                          ease: 'easeOut',
+                        }}
+                        className="h-full bg-[#E87935]"
+                      />
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -227,6 +347,7 @@ export default function ExplorationMode({
             <ExplorationHUD
               activeLocation={activeLocation}
               isEntering={isEntering}
+              isCameraFocused={Boolean(focusedLocationId)}
               quickNavOpen={quickNavOpen}
               onToggleQuickNav={() => {
                 playExplorationSound('toggle', soundEnabled);
@@ -259,9 +380,7 @@ export default function ExplorationMode({
               onZoomOut={() =>
                 setZoomCommand({ delta: -0.16, ts: Date.now() })
               }
-              onResetCamera={() =>
-                setCameraTarget({ mode: 'overview', ts: Date.now() })
-              }
+              onResetCamera={handleResetOverview}
               closeButtonRef={closeButtonRef}
             />
           </motion.div>

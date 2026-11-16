@@ -46,6 +46,7 @@ export default function App() {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [toastNotification, setToastNotification] = useState(null); // { title: string, message: string, tone: 'info' | 'success' }
   const toastTimerRef = useRef(null);
+  const arrivalTimerRef = useRef(null);
 
   // Easter Egg Modal States (Mutually exclusive to prevent backdrop stacking)
   const [terminalOpen, setTerminalOpen] = useState(false);
@@ -63,6 +64,7 @@ export default function App() {
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      if (arrivalTimerRef.current) clearTimeout(arrivalTimerRef.current);
     };
   }, []);
 
@@ -120,10 +122,22 @@ export default function App() {
     };
   }, [anyModalOpen]);
 
-  const scrollToSection = (id) => {
+  const scrollToSection = (id, fromExploration = false) => {
     setMobileMenuOpen(false);
     const element = document.getElementById(id);
     if (element) {
+      if (fromExploration && !prefersReducedMotion) {
+        if (arrivalTimerRef.current) clearTimeout(arrivalTimerRef.current);
+        SECTION_IDS.forEach((secId) => {
+          const secEl = document.getElementById(secId);
+          if (secEl) secEl.removeAttribute('data-arrival-section');
+        });
+        element.setAttribute('data-arrival-section', 'true');
+        arrivalTimerRef.current = setTimeout(() => {
+          element.removeAttribute('data-arrival-section');
+        }, 1600);
+      }
+
       element.scrollIntoView({
         behavior: prefersReducedMotion ? 'auto' : 'smooth',
       });
