@@ -3,8 +3,10 @@ import { ArrowUpRight, Compass } from 'lucide-react';
 import {
   EXPLORATION_LOCATIONS,
   EXPLORATION_PATHWAYS,
+  TRANSITION_TIMINGS,
 } from './explorationData.js';
 import { ExplorationPortalNode } from './ExplorationLocation.jsx';
+import { useTheme } from '../../context/ThemeContext.jsx';
 
 /**
  * Checks whether the current browser environment supports WebGL rendering.
@@ -33,6 +35,16 @@ function cinematicEaseInOut(t) {
   return clamped < 0.5
     ? 4 * clamped * clamped * clamped
     : 1 - Math.pow(-2 * clamped + 2, 3) / 2;
+}
+
+/**
+ * Ease-in/ease-out curve with slight forward acceleration for Phase 2 Camera Approach.
+ */
+function cameraApproachEase(t) {
+  const c = Math.max(0, Math.min(1, t));
+  return c < 0.55
+    ? 2.2 * c * c
+    : 1 - Math.pow(-2 * c + 2, 2.4) / 2;
 }
 
 /**
@@ -148,7 +160,7 @@ function drawPlatform3D(
   }
 
   // Ground shadow
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.58)';
+  ctx.fillStyle = palette.shadowFill || 'rgba(0, 0, 0, 0.58)';
   ctx.beginPath();
   for (let i = 0; i < sides; i++) {
     const angle = (i / sides) * Math.PI * 2 + Math.PI / sides;
@@ -173,7 +185,10 @@ function drawPlatform3D(
     const bA = botPts[i];
 
     if (tA.y + tB.y >= topPts[(i + Math.floor(sides / 2)) % sides].y * 1.95) {
-      ctx.fillStyle = i % 2 === 0 ? '#181715' : '#121110';
+      ctx.fillStyle =
+        i % 2 === 0
+          ? palette.wallEven || '#181715'
+          : palette.wallOdd || '#121110';
       ctx.strokeStyle = palette.wallStroke || 'rgba(51, 48, 45, 0.9)';
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -331,6 +346,7 @@ function drawSectorArchitecture3D(
   isFocused,
   isTransitionTarget,
   time,
+  isLight,
 ) {
   const { x: cx, z: cz } = loc.position;
   const isHighlighted = isHovered || isSelected || isFocused || isTransitionTarget;
@@ -349,9 +365,13 @@ function drawSectorArchitecture3D(
     0,
     0,
     isTransitionTarget
-      ? '#F3A45B'
+      ? '#C65E24'
       : isHighlighted
-      ? 'rgba(232, 121, 53, 0.48)'
+      ? isLight
+        ? 'rgba(198, 94, 36, 0.65)'
+        : 'rgba(232, 121, 53, 0.48)'
+      : isLight
+      ? 'rgba(185, 174, 158, 0.7)'
       : 'rgba(51, 48, 45, 0.45)',
     isHighlighted ? 1.6 : 1,
     8,
@@ -360,16 +380,35 @@ function drawSectorArchitecture3D(
   // 1. Base Octagonal Sector Platform
   drawPlatform3D(ctx, cam, cx, 0, cz, 66, baseElevation, 8, {
     topFill: isTransitionTarget
-      ? '#352A20'
+      ? isLight
+        ? '#F3E5D5'
+        : '#352A20'
       : isHighlighted
-      ? '#24211E'
+      ? isLight
+        ? '#FAF8F3'
+        : '#24211E'
+      : isLight
+      ? '#E5E0D6'
       : '#181715',
     topStroke: isTransitionTarget
-      ? '#FFF'
+      ? '#C65E24'
       : isHighlighted
-      ? loc.accent
+      ? isLight
+        ? '#C65E24'
+        : loc.accent
+      : isLight
+      ? '#C4B9A8'
       : '#33302D',
-    wallStroke: isHighlighted ? 'rgba(232, 121, 53, 0.6)' : '#282623',
+    wallEven: isLight ? '#D8D0C3' : '#181715',
+    wallOdd: isLight ? '#C9C0B1' : '#121110',
+    wallStroke: isHighlighted
+      ? 'rgba(198, 94, 36, 0.65)'
+      : isLight
+      ? '#BFB5A4'
+      : '#282623',
+    shadowFill: isLight
+      ? 'rgba(70, 58, 46, 0.16)'
+      : 'rgba(0, 0, 0, 0.58)',
     strokeWidth: isTransitionTarget ? 2.5 : isHighlighted ? 2 : 1.2,
   });
 
@@ -385,36 +424,64 @@ function drawSectorArchitecture3D(
     0,
     time * (isTransitionTarget ? 2.5 : isHighlighted ? 0.95 : 0.35),
     isTransitionTarget
-      ? '#F3A45B'
+      ? '#C65E24'
       : isHighlighted
-      ? loc.accent
+      ? isLight
+        ? '#C65E24'
+        : loc.accent
+      : isLight
+      ? 'rgba(198, 94, 36, 0.42)'
       : 'rgba(232, 121, 53, 0.32)',
     isTransitionTarget ? 2.6 : isHighlighted ? 2 : 1,
   );
 
-  const pal = {
-    topFace: isTransitionTarget
-      ? '#E87935'
-      : isHighlighted
-      ? '#322E2A'
-      : '#252320',
-    leftFace: isTransitionTarget
-      ? '#3B2818'
-      : isHighlighted
-      ? '#25221F'
-      : '#1B1A18',
-    rightFace: isTransitionTarget
-      ? '#24180E'
-      : isHighlighted
-      ? '#1A1816'
-      : '#121110',
-    stroke: isTransitionTarget
-      ? '#F3A45B'
-      : isHighlighted
-      ? loc.accent
-      : 'rgba(232, 121, 53, 0.4)',
-    lineWidth: isTransitionTarget ? 2 : isHighlighted ? 1.5 : 1,
-  };
+  const pal = isLight
+    ? {
+        topFace: isTransitionTarget
+          ? '#E87935'
+          : isHighlighted
+          ? '#FAF8F3'
+          : '#F4F0E8',
+        leftFace: isTransitionTarget
+          ? '#D96B2B'
+          : isHighlighted
+          ? '#E9E3D8'
+          : '#E2DCD0',
+        rightFace: isTransitionTarget
+          ? '#B8521A'
+          : isHighlighted
+          ? '#D8D0C2'
+          : '#D1C8BA',
+        stroke: isTransitionTarget
+          ? '#8F3D0E'
+          : isHighlighted
+          ? '#C65E24'
+          : 'rgba(113, 104, 94, 0.55)',
+        lineWidth: isTransitionTarget ? 2 : isHighlighted ? 1.5 : 1,
+      }
+    : {
+        topFace: isTransitionTarget
+          ? '#E87935'
+          : isHighlighted
+          ? '#322E2A'
+          : '#252320',
+        leftFace: isTransitionTarget
+          ? '#3B2818'
+          : isHighlighted
+          ? '#25221F'
+          : '#1B1A18',
+        rightFace: isTransitionTarget
+          ? '#24180E'
+          : isHighlighted
+          ? '#1A1816'
+          : '#121110',
+        stroke: isTransitionTarget
+          ? '#F3A45B'
+          : isHighlighted
+          ? loc.accent
+          : 'rgba(232, 121, 53, 0.4)',
+        lineWidth: isTransitionTarget ? 2 : isHighlighted ? 1.5 : 1,
+      };
 
   // 3. Bespoke 3D Structure Silhouette per Archetype
   if (loc.archetype === 'server-complex') {
@@ -696,17 +763,25 @@ function drawSectorArchitecture3D(
 /**
  * Draws the Central Core Nexus at (0, 0, 0) anchoring the digital world.
  */
-function drawCentralCoreNexus3D(ctx, cam, time) {
+function drawCentralCoreNexus3D(ctx, cam, time, isLight) {
   drawPlatform3D(ctx, cam, 0, 0, 0, 82, 15, 8, {
-    topFill: '#1B1917',
-    topStroke: '#E87935',
-    wallStroke: 'rgba(232, 121, 53, 0.5)',
+    topFill: isLight ? '#E5E0D6' : '#1B1917',
+    topStroke: isLight ? '#C65E24' : '#E87935',
+    wallEven: isLight ? '#D8D0C3' : '#181715',
+    wallOdd: isLight ? '#C9C0B1' : '#121110',
+    wallStroke: 'rgba(198, 94, 36, 0.5)',
+    shadowFill: isLight
+      ? 'rgba(70, 58, 46, 0.18)'
+      : 'rgba(0, 0, 0, 0.58)',
     strokeWidth: 1.8,
   });
   drawPlatform3D(ctx, cam, 0, 15, 0, 50, 13, 8, {
-    topFill: '#24211E',
-    topStroke: '#F3A45B',
-    wallStroke: '#33302D',
+    topFill: isLight ? '#FAF8F3' : '#24211E',
+    topStroke: isLight ? '#E87935' : '#F3A45B',
+    wallEven: isLight ? '#E2DCD0' : '#181715',
+    wallOdd: isLight ? '#D4CCC0' : '#121110',
+    wallStroke: isLight ? '#C4B9A8' : '#33302D',
+    shadowFill: 'rgba(0, 0, 0, 0)',
     strokeWidth: 1.2,
   });
 
@@ -770,8 +845,9 @@ function drawCentralCoreNexus3D(ctx, cam, time) {
 }
 
 /**
- * Draws the Phase B Impact Frame & Phase C Radial Portal Vortex centered on
- * the selected destination structure.
+ * Draws the Phase 2 Camera Approach Rings, Phase 3 Arrival Impact Frame,
+ * and Phase 4 Settling Glow centered on the selected destination structure.
+ * Phase 3 Impact ONLY runs after Phase 2 Camera Approach has completed.
  */
 function drawCinematicImpactEffect(
   ctx,
@@ -782,7 +858,12 @@ function drawCinematicImpactEffect(
   width,
   height,
 ) {
-  if (!loc || (transitionPhase !== 'impact' && transitionPhase !== 'punch')) {
+  if (
+    !loc ||
+    (transitionPhase !== 'approach' &&
+      transitionPhase !== 'impact' &&
+      transitionPhase !== 'reveal')
+  ) {
     return;
   }
 
@@ -795,9 +876,44 @@ function drawCinematicImpactEffect(
 
   ctx.save();
 
-  if (transitionPhase === 'impact') {
-    // Phase B (120–220ms): Deliberate high-contrast warm orange impact frame + shockwave
-    const burstRadius = Math.max(width, height) * (0.18 + phaseProgress * 0.55);
+  if (transitionPhase === 'approach') {
+    // Phase 2 (Camera Approach): Subtle converging energy rings drawing focus to the building
+    const approachAlpha = Math.min(1, phaseProgress * 1.2) * 0.22;
+    const tunnelRadius = Math.max(width, height) * 0.6;
+    const radial = ctx.createRadialGradient(
+      centerPt.x,
+      centerPt.y,
+      16,
+      centerPt.x,
+      centerPt.y,
+      tunnelRadius,
+    );
+    radial.addColorStop(0, `rgba(232, 121, 53, ${approachAlpha})`);
+    radial.addColorStop(0.55, 'rgba(232, 121, 53, 0.04)');
+    radial.addColorStop(1, 'rgba(10, 10, 10, 0.55)');
+
+    ctx.fillStyle = radial;
+    ctx.fillRect(0, 0, width, height);
+
+    for (let ring = 0; ring < 2; ring++) {
+      const p = (phaseProgress * 1.4 + ring * 0.5) % 1;
+      ctx.strokeStyle = `rgba(243, 164, 91, ${(1 - p) * 0.45})`;
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.arc(
+        centerPt.x,
+        centerPt.y,
+        (28 + p * 160) * cam.zoom,
+        0,
+        Math.PI * 2,
+      );
+      ctx.stroke();
+    }
+  } else if (transitionPhase === 'impact') {
+    // Phase 3 (Arrival Impact — AFTER camera approach completes):
+    // Brief high-contrast flash, orange energy pulse, geometric shockwave, and directional streaks
+    const flashEnvelope = Math.sin(phaseProgress * Math.PI);
+    const burstRadius = Math.max(width, height) * (0.16 + phaseProgress * 0.52);
     const radial = ctx.createRadialGradient(
       centerPt.x,
       centerPt.y,
@@ -806,35 +922,47 @@ function drawCinematicImpactEffect(
       centerPt.y,
       burstRadius,
     );
-    radial.addColorStop(0, 'rgba(255, 247, 237, 0.72)');
-    radial.addColorStop(0.18, 'rgba(243, 164, 91, 0.58)');
-    radial.addColorStop(0.45, 'rgba(232, 121, 53, 0.28)');
+    radial.addColorStop(0, `rgba(255, 247, 237, ${0.78 * flashEnvelope})`);
+    radial.addColorStop(0.2, `rgba(243, 164, 91, ${0.62 * flashEnvelope})`);
+    radial.addColorStop(0.48, `rgba(232, 121, 53, ${0.32 * flashEnvelope})`);
     radial.addColorStop(1, 'rgba(16, 16, 16, 0)');
 
     ctx.fillStyle = radial;
     ctx.fillRect(0, 0, width, height);
 
-    // Crisp impact shockwave ring
-    ctx.strokeStyle = '#FFF7ED';
-    ctx.lineWidth = 3.5 * (1 - phaseProgress * 0.4);
+    // Geometric impact-frame shockwave rings
+    ctx.strokeStyle = `rgba(255, 247, 237, ${0.95 - phaseProgress * 0.5})`;
+    ctx.lineWidth = 3.2 * (1 - phaseProgress * 0.35);
     ctx.beginPath();
     ctx.arc(
       centerPt.x,
       centerPt.y,
-      40 + phaseProgress * 190 * cam.zoom,
+      (36 + phaseProgress * 175) * cam.zoom,
       0,
       Math.PI * 2,
     );
     ctx.stroke();
 
-    // Directional speed/convergence lines around the structure
+    // Inner geometric diamond distortion frame around destination
+    const dSize = (46 + phaseProgress * 95) * cam.zoom;
+    ctx.strokeStyle = `rgba(232, 121, 53, ${0.85 * (1 - phaseProgress * 0.4)})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(centerPt.x, centerPt.y - dSize * 0.75);
+    ctx.lineTo(centerPt.x + dSize, centerPt.y);
+    ctx.lineTo(centerPt.x, centerPt.y + dSize * 0.75);
+    ctx.lineTo(centerPt.x - dSize, centerPt.y);
+    ctx.closePath();
+    ctx.stroke();
+
+    // Directional motion streaks
     const rays = 12;
-    ctx.strokeStyle = 'rgba(243, 164, 91, 0.85)';
+    ctx.strokeStyle = `rgba(243, 164, 91, ${0.85 * flashEnvelope})`;
     ctx.lineWidth = 2;
     for (let i = 0; i < rays; i++) {
       const angle = (i / rays) * Math.PI * 2 + 0.15;
-      const rInner = (48 + phaseProgress * 40) * cam.zoom;
-      const rOuter = (115 + phaseProgress * 160) * cam.zoom;
+      const rInner = (44 + phaseProgress * 36) * cam.zoom;
+      const rOuter = (105 + phaseProgress * 150) * cam.zoom;
       ctx.beginPath();
       ctx.moveTo(
         centerPt.x + Math.cos(angle) * rInner,
@@ -846,39 +974,21 @@ function drawCinematicImpactEffect(
       );
       ctx.stroke();
     }
-  } else if (transitionPhase === 'punch') {
-    // Phase C (220–700ms): Camera punch-in radial energy tunnel
-    const tunnelRadius = Math.max(width, height) * 0.65;
+  } else if (transitionPhase === 'reveal') {
+    // Phase 4 (Section Reveal Settle): Impact settles cleanly before portfolio reveal
+    const settleAlpha = (1 - phaseProgress) * 0.35;
     const radial = ctx.createRadialGradient(
       centerPt.x,
       centerPt.y,
-      10,
+      8,
       centerPt.x,
       centerPt.y,
-      tunnelRadius,
+      Math.max(width, height) * 0.5,
     );
-    radial.addColorStop(0, 'rgba(232, 121, 53, 0.26)');
-    radial.addColorStop(0.5, 'rgba(232, 121, 53, 0.08)');
-    radial.addColorStop(1, 'rgba(10, 10, 10, 0.72)');
-
+    radial.addColorStop(0, `rgba(232, 121, 53, ${settleAlpha})`);
+    radial.addColorStop(1, 'rgba(16, 16, 16, 0)');
     ctx.fillStyle = radial;
     ctx.fillRect(0, 0, width, height);
-
-    // Expanding concentric portal rings
-    for (let ring = 0; ring < 3; ring++) {
-      const p = (phaseProgress + ring * 0.33) % 1;
-      ctx.strokeStyle = `rgba(243, 164, 91, ${(1 - p) * 0.65})`;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(
-        centerPt.x,
-        centerPt.y,
-        (30 + p * 220) * cam.zoom,
-        0,
-        Math.PI * 2,
-      );
-      ctx.stroke();
-    }
   }
 
   ctx.restore();
@@ -985,6 +1095,7 @@ export default function ExplorationScene({
   onSelectLocation,
   onEnterLocation,
 }) {
+  const { isLight } = useTheme();
   const canvasRef = useRef(null);
   const [webglAvailable, setWebglAvailable] = useState(true);
   const [portalScreenCoords, setPortalScreenCoords] = useState({});
@@ -1068,13 +1179,15 @@ export default function ExplorationScene({
       // Zoom 1.65x - 1.8x overview scale as specified in Section 2
       cam.animToZoom = Math.min(1.85, baseOverviewZoom * 1.72);
       cam.animDurationMs = motionReduced ? 120 : 780;
-    } else if (cameraTarget.mode === 'punch' && cameraTarget.position) {
-      cam.mode = 'punch';
+    } else if (cameraTarget.mode === 'approach' && cameraTarget.position) {
+      cam.mode = 'approach';
       cam.animToX = cameraTarget.position.x;
       cam.animToZ = cameraTarget.position.z;
-      // Accelerate camera punch-in scale (2.25x overview scale)
-      cam.animToZoom = Math.min(2.25, baseOverviewZoom * 2.3);
-      cam.animDurationMs = motionReduced ? 100 : 480;
+      // Smoothly approach and zoom in to center the selected building before impact
+      cam.animToZoom = Math.min(2.15, baseOverviewZoom * 2.15);
+      cam.animDurationMs = motionReduced
+        ? 120
+        : TRANSITION_TIMINGS.approachDuration;
     }
   }, [cameraTarget, motionReduced]);
 
@@ -1188,7 +1301,9 @@ export default function ExplorationScene({
           cam.zoom = cam.animToZoom;
           cam.isTweening = false;
         } else {
-          const eased = cinematicEaseInOut(rawProgress);
+          const easeFn =
+            cam.mode === 'approach' ? cameraApproachEase : cinematicEaseInOut;
+          const eased = easeFn(rawProgress);
           cam.x = cam.animFromX + (cam.animToX - cam.animFromX) * eased;
           cam.z = cam.animFromZ + (cam.animToZ - cam.animFromZ) * eased;
           cam.zoom =
@@ -1217,9 +1332,17 @@ export default function ExplorationScene({
         cam.zoom += (hoverTargetZoom - cam.zoom) * pullDamping;
       }
 
-      // Subtle pointer yaw parallax
+      // Subtle pointer yaw parallax + slight viewing angle adjustment during approach
+      const approachYawOffset =
+        !motionReduced &&
+        transitionState &&
+        transitionState.phase !== 'idle'
+          ? 0.05
+          : 0;
       const desiredYaw =
-        Math.PI / 4 + (motionReduced ? 0 : cam.pointerNormX * 0.035);
+        Math.PI / 4 +
+        approachYawOffset +
+        (motionReduced ? 0 : cam.pointerNormX * 0.035);
       cam.yaw += (desiredYaw - cam.yaw) * Math.min(1, dt * 6);
 
       // Sync DOM portal coordinates when camera moves
@@ -1229,14 +1352,31 @@ export default function ExplorationScene({
         syncPortalOverlayCoords(width, height);
       }
 
+      // Subtle camera shake ONLY during Phase 3 Arrival Impact (omitted in reduced-motion)
+      let impactShakeX = 0;
+      let impactShakeY = 0;
+      if (
+        !motionReduced &&
+        transitionState?.phase === 'impact'
+      ) {
+        const impElapsed = now - (transitionState.phaseStartTime || now);
+        const impProgress = Math.min(
+          1,
+          Math.max(0, impElapsed / Math.max(1, TRANSITION_TIMINGS.impactDuration)),
+        );
+        const decay = 1 - impProgress;
+        impactShakeX = Math.sin(impProgress * Math.PI * 6) * 5 * decay;
+        impactShakeY = Math.cos(impProgress * Math.PI * 5) * 3.5 * decay;
+      }
+
       const projectionCam = {
         x: cam.x,
         z: cam.z,
         zoom: cam.zoom,
         yaw: cam.yaw,
         pitch: cam.pitch,
-        centerX: width / 2,
-        centerY: height * 0.52,
+        centerX: width / 2 + impactShakeX,
+        centerY: height * 0.52 + impactShakeY,
       };
 
       ctx.clearRect(0, 0, width, height);
@@ -1246,7 +1386,11 @@ export default function ExplorationScene({
       const gridStep = visualQuality === 'LOW' ? 95 : 47.5;
       for (let g = -gridExtent; g <= gridExtent; g += gridStep) {
         const isMajor = Math.abs(g % 190) < 1;
-        ctx.strokeStyle = isMajor
+        ctx.strokeStyle = isLight
+          ? isMajor
+            ? 'rgba(198, 94, 36, 0.22)'
+            : 'rgba(180, 169, 154, 0.48)'
+          : isMajor
           ? 'rgba(232, 121, 53, 0.14)'
           : 'rgba(51, 48, 45, 0.32)';
         ctx.lineWidth = isMajor ? 1.2 : 0.75;
@@ -1323,13 +1467,23 @@ export default function ExplorationScene({
 
         // Base conduit line
         ctx.strokeStyle = isCoreTransitionPath
-          ? '#FFF7ED'
+          ? isLight
+            ? '#C65E24'
+            : '#FFF7ED'
           : isPathActive
           ? path.kind === 'core'
-            ? '#E87935'
+            ? isLight
+              ? '#C65E24'
+              : '#E87935'
+            : isLight
+            ? 'rgba(198, 94, 36, 0.78)'
             : 'rgba(243, 164, 91, 0.72)'
           : path.kind === 'core'
-          ? 'rgba(232, 121, 53, 0.32)'
+          ? isLight
+            ? 'rgba(198, 94, 36, 0.42)'
+            : 'rgba(232, 121, 53, 0.32)'
+          : isLight
+          ? 'rgba(140, 128, 114, 0.38)'
           : 'rgba(56, 189, 248, 0.16)';
         ctx.lineWidth = isCoreTransitionPath
           ? 4
@@ -1416,12 +1570,20 @@ export default function ExplorationScene({
 
       renderables.forEach((item) => {
         if (item.type === 'core') {
-          drawCentralCoreNexus3D(ctx, projectionCam, elapsed);
+          ctx.save();
+          if (isTransitioning) ctx.globalAlpha = 0.45;
+          drawCentralCoreNexus3D(ctx, projectionCam, elapsed, isLight);
+          ctx.restore();
         } else {
           const isHovered = hoveredLocation?.id === item.loc.id;
           const isSelected = selectedLocation?.id === item.loc.id;
           const isFocused = focusedLocationId === item.loc.id;
           const isTransitionTarget = isTransitioning && isSelected;
+          ctx.save();
+          if (isTransitioning && !isTransitionTarget) {
+            // Phase 1+: Slightly dim surrounding non-selected structures
+            ctx.globalAlpha = 0.38;
+          }
           drawSectorArchitecture3D(
             ctx,
             projectionCam,
@@ -1431,7 +1593,9 @@ export default function ExplorationScene({
             isFocused,
             isTransitionTarget,
             elapsed,
+            isLight,
           );
+          ctx.restore();
         }
       });
 
@@ -1491,6 +1655,7 @@ export default function ExplorationScene({
     transitionState,
     visualQuality,
     motionReduced,
+    isLight,
     syncPortalOverlayCoords,
   ]);
 

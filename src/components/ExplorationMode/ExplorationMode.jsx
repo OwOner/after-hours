@@ -25,7 +25,7 @@ export default function ExplorationMode({
   const systemReducedMotion = useReducedMotion();
   const closeButtonRef = useRef(null);
   const savedScrollYRef = useRef(0);
-  const transitionTimersRef = useRef([]);
+  const timelineRafRef = useRef(null);
 
   // Environment & HUD State
   const [hoveredLocation, setHoveredLocation] = useState(null);
@@ -34,7 +34,7 @@ export default function ExplorationMode({
   );
   const [focusedLocationId, setFocusedLocationId] = useState(null);
   const [transitionState, setTransitionState] = useState({
-    phase: 'idle', // 'idle' | 'lock' | 'impact' | 'punch' | 'cut'
+    phase: 'idle', // 'idle' | 'lock' | 'approach' | 'impact' | 'reveal'
     phaseStartTime: 0,
     phaseDuration: 0,
   });
@@ -56,13 +56,15 @@ export default function ExplorationMode({
     setMotionReduced(Boolean(systemReducedMotion));
   }, [systemReducedMotion]);
 
-  const clearTransitionTimers = () => {
-    transitionTimersRef.current.forEach((id) => clearTimeout(id));
-    transitionTimersRef.current = [];
+  const cancelTransitionTimeline = () => {
+    if (timelineRafRef.current !== null) {
+      window.cancelAnimationFrame(timelineRafRef.current);
+      timelineRafRef.current = null;
+    }
   };
 
   useEffect(() => {
-    return () => clearTransitionTimers();
+    return () => cancelTransitionTimeline();
   }, []);
 
   const isEntering = transitionState.phase !== 'idle';
@@ -72,7 +74,7 @@ export default function ExplorationMode({
     if (typeof window !== 'undefined') {
       savedScrollYRef.current = window.scrollY;
     }
-    clearTransitionTimers();
+    cancelTransitionTimeline();
     setTransitionState({ phase: 'idle', phaseStartTime: 0, phaseDuration: 0 });
     setFocusedLocationId(null);
     setQuickNavOpen(false);
@@ -81,7 +83,7 @@ export default function ExplorationMode({
   };
 
   const handleExitExploration = () => {
-    clearTransitionTimers();
+    cancelTransitionTimeline();
     setTransitionState({ phase: 'idle', phaseStartTime: 0, phaseDuration: 0 });
     setFocusedLocationId(null);
     setQuickNavOpen(false);
@@ -128,96 +130,124 @@ export default function ExplorationMode({
   };
 
   /**
-   * Executes the 5-Phase Cinematic Transition Sequence (or a simple 220ms
-   * reduced-motion fade when motionReduced is enabled).
+   * Executes the Coordinated 4-Phase Destination Entry Timeline:
+   * - Phase 1 (Destination Lock, 0–170ms): Highlight building, dim surrounding map, prepare camera.
+   * - Phase 2 (Camera Approach, 170–910ms): Smoothly zoom in and move camera toward destination FIRST.
+   * - Phase 3 (Arrival Impact, 910–1070ms): Trigger impact frames & subtle shake ONLY after camera approach completes.
+   * - Phase 4 (Section Reveal, 1070–1410ms): Settle impact and transition into the portfolio section.
    */
   const handleEnterPortal = (loc) => {
     if (!loc || isEntering) return;
-    clearTransitionTimers();
+    cancelTransitionTimeline();
     playExplorationSound('select', soundEnabled);
     setSelectedLocation(loc);
     setFocusedLocationId(loc.id);
     setQuickNavOpen(false);
 
+    const startTime = performance.now();
+
     if (motionReduced) {
+      const total = TRANSITION_TIMINGS.reducedMotionTotal;
       setTransitionState({
-        phase: 'cut',
-        phaseStartTime: performance.now(),
-        phaseDuration: TRANSITION_TIMINGS.reducedMotionTotal,
+        phase: 'reveal',
+        phaseStartTime: startTime,
+        phaseDuration: total,
       });
       setCameraTarget({
         mode: 'focus',
         position: loc.position,
         ts: Date.now(),
       });
-      const tEnd = setTimeout(() => {
+
+      const stepReduced = (now) => {
+        if (now - startTime >= total) {
+          timelineRafRef.current = null;
+          setTransitionState({
+            phase: 'idle',
+            phaseStartTime: 0,
+            phaseDuration: 0,
+          });
+          setFocusedLocationId(null);
+          onClose();
+          onNavigateToSection(loc.sectionId, true);
+          return;
+        }
+        timelineRafRef.current = window.requestAnimationFrame(stepReduced);
+      };
+      timelineRafRef.current = window.requestAnimationFrame(stepReduced);
+      return;
+    }
+
+    const { lockDuration, approachDuration, impactDuration, revealDuration } =
+      TRANSITION_TIMINGS;
+    const tApproachStart = lockDuration;
+    const tImpactStart = lockDuration + approachDuration;
+    const tRevealStart = tImpactStart + impactDuration;
+    const tComplete = tRevealStart + revealDuration;
+
+    let activePhase = 'lock';
+    setTransitionState({
+      phase: 'lock',
+      phaseStartTime: startTime,
+      phaseDuration: lockDuration,
+    });
+
+    const stepTimeline = (now) => {
+      const elapsed = now - startTime;
+
+      if (elapsed >= tComplete) {
+        timelineRafRef.current = null;
         setTransitionState({
           phase: 'idle',
           phaseStartTime: 0,
           phaseDuration: 0,
         });
+        setFocusedLocationId(null);
         onClose();
         onNavigateToSection(loc.sectionId, true);
-      }, TRANSITION_TIMINGS.reducedMotionTotal);
-      transitionTimersRef.current.push(tEnd);
-      return;
-    }
+        return;
+      }
 
-    const { lockDuration, impactDuration, punchDuration, cutDuration } =
-      TRANSITION_TIMINGS;
+      if (elapsed >= tRevealStart && activePhase !== 'reveal') {
+        activePhase = 'reveal';
+        setTransitionState({
+          phase: 'reveal',
+          phaseStartTime: now,
+          phaseDuration: revealDuration,
+        });
+      } else if (
+        elapsed >= tImpactStart &&
+        elapsed < tRevealStart &&
+        activePhase !== 'impact'
+      ) {
+        activePhase = 'impact';
+        setTransitionState({
+          phase: 'impact',
+          phaseStartTime: now,
+          phaseDuration: impactDuration,
+        });
+      } else if (
+        elapsed >= tApproachStart &&
+        elapsed < tImpactStart &&
+        activePhase !== 'approach'
+      ) {
+        activePhase = 'approach';
+        setTransitionState({
+          phase: 'approach',
+          phaseStartTime: now,
+          phaseDuration: approachDuration,
+        });
+        setCameraTarget({
+          mode: 'approach',
+          position: loc.position,
+          ts: Date.now(),
+        });
+      }
 
-    // Phase A — Selection Lock (0–120ms)
-    setTransitionState({
-      phase: 'lock',
-      phaseStartTime: performance.now(),
-      phaseDuration: lockDuration,
-    });
+      timelineRafRef.current = window.requestAnimationFrame(stepTimeline);
+    };
 
-    // Phase B — Impact Frame (120–220ms)
-    const tImpact = setTimeout(() => {
-      setTransitionState({
-        phase: 'impact',
-        phaseStartTime: performance.now(),
-        phaseDuration: impactDuration,
-      });
-    }, lockDuration);
-
-    // Phase C — Camera Punch-In (220–700ms)
-    const tPunch = setTimeout(() => {
-      setTransitionState({
-        phase: 'punch',
-        phaseStartTime: performance.now(),
-        phaseDuration: punchDuration,
-      });
-      setCameraTarget({
-        mode: 'punch',
-        position: loc.position,
-        ts: Date.now(),
-      });
-    }, lockDuration + impactDuration);
-
-    // Phase D — Transition Cut (700–950ms)
-    const tCut = setTimeout(() => {
-      setTransitionState({
-        phase: 'cut',
-        phaseStartTime: performance.now(),
-        phaseDuration: cutDuration,
-      });
-    }, lockDuration + impactDuration + punchDuration);
-
-    // Phase E — Portfolio Arrival (950ms)
-    const tArrival = setTimeout(() => {
-      setTransitionState({
-        phase: 'idle',
-        phaseStartTime: 0,
-        phaseDuration: 0,
-      });
-      setFocusedLocationId(null);
-      onClose();
-      onNavigateToSection(loc.sectionId, true);
-    }, lockDuration + impactDuration + punchDuration + cutDuration);
-
-    transitionTimersRef.current.push(tImpact, tPunch, tCut, tArrival);
+    timelineRafRef.current = window.requestAnimationFrame(stepTimeline);
   };
 
   const handleCycleQuality = () => {
@@ -302,15 +332,15 @@ export default function ExplorationMode({
               />
             </Suspense>
 
-            {/* Phase D (700–950ms): Cinematic Orange-Tinted Portal Wipe & Tactical Destination Readout */}
+            {/* Phase 4 (Section Reveal): Impact settles into clean section transition */}
             <AnimatePresence>
-              {transitionState.phase === 'cut' && selectedLocation && (
+              {transitionState.phase === 'reveal' && selectedLocation && (
                 <motion.div
-                  key="portal-transition-cut"
+                  key="portal-transition-reveal"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: motionReduced ? 0.1 : 0.22 }}
+                  transition={{ duration: motionReduced ? 0.1 : 0.25 }}
                   style={{
                     background:
                       'radial-gradient(circle at 50% 50%, rgba(232,121,53,0.28) 0%, rgba(16,16,16,0.96) 68%)',
@@ -332,7 +362,7 @@ export default function ExplorationMode({
                         initial={{ width: '0%' }}
                         animate={{ width: '100%' }}
                         transition={{
-                          duration: motionReduced ? 0.12 : 0.23,
+                          duration: motionReduced ? 0.12 : 0.28,
                           ease: 'easeOut',
                         }}
                         className="h-full bg-[#E87935]"

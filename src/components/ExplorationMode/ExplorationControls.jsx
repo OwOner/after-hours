@@ -8,6 +8,7 @@ import {
   RotateCcw,
   Layers,
 } from 'lucide-react';
+import ThemeToggle from '../ThemeToggle.jsx';
 
 const QUALITY_LABELS = {
   AUTO: 'Auto',
@@ -129,6 +130,8 @@ export default function ExplorationControls({
           <Activity className="w-3.5 h-3.5 text-[#E87935]" />
           <span>Reduced Motion: {motionReduced ? 'On' : 'Off'}</span>
         </button>
+
+        <ThemeToggle variant="hud" />
       </div>
     </div>
   );

@@ -97,7 +97,7 @@ export default function Contact({
                 <Mail className="w-4 h-4 text-[#E87935] shrink-0" />
                 <div className="min-w-0">
                   <div className="font-mono text-[10px] text-[#A7A19A]">
-                    DIRECT INQUIRY
+                    DIRECT INQUIRY // {SITE_CONFIG.contactEmail}
                   </div>
                   <div className="font-mono text-xs sm:text-sm text-[#E8E4DE] truncate">
                     Send a message via workspace form

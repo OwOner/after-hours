@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { CheckCircle2, Info, X } from 'lucide-react';
 import { MOTION_TOKENS } from './utils/motion.jsx';
 import { SITE_CONFIG } from './data/portfolioData.js';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 
 import Navigation from './components/Navigation.jsx';
 import Hero from './components/Hero.jsx';
@@ -14,6 +15,7 @@ import CreativeGallery from './components/CreativeGallery.jsx';
 import Contact from './components/Contact.jsx';
 import Footer from './components/Footer.jsx';
 import ExplorationMode from './components/ExplorationMode/ExplorationMode.jsx';
+import SystemInitialization from './components/SystemInitialization.jsx';
 
 import ProjectCaseStudyModal from './components/modals/ProjectCaseStudyModal.jsx';
 import VideoPreviewModal from './components/modals/VideoPreviewModal.jsx';
@@ -197,7 +199,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#101010] text-[#E8E4DE] font-sans selection:bg-[#E87935] selection:text-[#101010] relative overflow-x-hidden">
+    <ThemeProvider>
+      <SystemInitialization />
+      <div className="min-h-screen bg-[#101010] text-[#E8E4DE] font-sans selection:bg-[#E87935] selection:text-[#101010] relative overflow-x-hidden">
       {/* Keyboard Skip Link for Accessibility */}
       <a
         href="#work"
@@ -361,7 +365,8 @@ export default function App() {
         isOpen={dungeonOpen}
         onClose={() => setDungeonOpen(false)}
       />
-    </div>
+      </div>
+    </ThemeProvider>
   );
 }
 

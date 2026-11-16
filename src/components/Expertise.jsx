@@ -1,12 +1,85 @@
 import { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
+  Sparkles,
+  CheckCircle2,
+  Film,
+  Scissors,
+  Camera,
+} from 'lucide-react';
+import {
   MOTION_TOKENS,
   createStaggerContainer,
   createFadeUpVariant,
   Reveal,
 } from '../utils/motion.jsx';
-import { EXPERTISE_CATEGORIES } from '../data/portfolioData.js';
+import {
+  EXPERTISE_CATEGORIES,
+  AI_ENGINEERING_DATA,
+  CREATIVE_TOOLS_DATA,
+} from '../data/portfolioData.js';
+
+/**
+ * Recognizable minimalist vector brand/tool icons for AI & Creative tools.
+ */
+function ToolIcon({ id }) {
+  if (id === 'chatgpt') {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-4 h-4 text-[#E87935]"
+        aria-hidden="true"
+      >
+        <path d="M12 3a4.5 4.5 0 0 0-3.89 2.25L4.5 11.5a4.5 4.5 0 0 0 0 4.5l2.1 3.64a4.5 4.5 0 0 0 6.15 1.65L19 17.6a4.5 4.5 0 0 0 1.65-6.15l-2.1-3.64A4.5 4.5 0 0 0 12 3Z" />
+        <circle cx="12" cy="12" r="2.5" />
+      </svg>
+    );
+  }
+  if (id === 'gemini') {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-4 h-4 text-[#E87935]"
+        aria-hidden="true"
+      >
+        <path d="M12 2c.6 5.2 4.8 9.4 10 10-5.2.6-9.4 4.8-10 10-.6-5.2-4.8-9.4-10-10 5.2-.6 9.4-4.8 10-10Z" />
+      </svg>
+    );
+  }
+  if (id === 'claude') {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-4 h-4 text-[#E87935]"
+        aria-hidden="true"
+      >
+        <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4" />
+      </svg>
+    );
+  }
+  if (id === 'davinci-resolve') {
+    return <Film className="w-4 h-4 text-[#E87935]" aria-hidden="true" />;
+  }
+  if (id === 'capcut') {
+    return <Scissors className="w-4 h-4 text-[#E87935]" aria-hidden="true" />;
+  }
+  return <Camera className="w-4 h-4 text-[#E87935]" aria-hidden="true" />;
+}
 
 export default function Expertise() {
   const [activeExpertiseTab, setActiveExpertiseTab] = useState('frontend');
@@ -34,8 +107,9 @@ export default function Expertise() {
         </p>
       </Reveal>
 
+      {/* CORE 5-DOMAIN TECHNICAL MATRIX */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
-        {/* Left Column: Category Selector (Responsive grid on mobile/tablet, vertical list on desktop) */}
+        {/* Left Column: Category Selector */}
         <motion.div
           role="tablist"
           aria-label="Technical Expertise Categories"
@@ -149,6 +223,145 @@ export default function Expertise() {
           </AnimatePresence>
         </Reveal>
       </div>
+
+      {/* PROMINENT SUBSECTION 1: AI-ASSISTED DEVELOPMENT & WORKFLOWS */}
+      <Reveal className="mt-12 sm:mt-16 bg-[#191919] border border-[#33302D] p-5 sm:p-8 md:p-10">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-[#33302D] pb-6 mb-8">
+          <div className="space-y-2 max-w-3xl">
+            <div className="inline-flex items-center gap-2 font-mono text-xs text-[#E87935] uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5 text-[#E87935]" />
+              <span>{AI_ENGINEERING_DATA.tag}</span>
+            </div>
+            <h3 className="font-heading text-2xl sm:text-3xl font-bold text-[#E8E4DE]">
+              {AI_ENGINEERING_DATA.title}
+            </h3>
+            <p className="text-xs sm:text-sm text-[#A7A19A] leading-relaxed">
+              {AI_ENGINEERING_DATA.subtitle}
+            </p>
+          </div>
+          <span className="font-mono text-[11px] px-3 py-1.5 bg-[#101010] border border-[#E87935]/50 text-[#F3A45B] self-start lg:self-end shrink-0 uppercase">
+            WORKFLOW MULTIPLIER // FUNDAMENTALS FIRST
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch">
+          {/* Left Column (7 cols): AI Tools I Use */}
+          <div className="lg:col-span-7 flex flex-col justify-between space-y-3.5">
+            <div className="font-mono text-[11px] text-[#E87935] uppercase tracking-wider">
+              AI Tools I Use
+            </div>
+            <div className="grid grid-cols-1 gap-3.5 flex-1">
+              {AI_ENGINEERING_DATA.tools.map((tool) => (
+                <motion.div
+                  key={tool.id}
+                  whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+                  transition={{
+                    duration: MOTION_TOKENS.fast,
+                    ease: MOTION_TOKENS.ease,
+                  }}
+                  className="p-4 bg-[#101010] border border-[#33302D] hover:border-[#E87935]/60 transition-colors flex flex-col justify-between gap-2"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-7 h-7 bg-[#191919] border border-[#33302D] flex items-center justify-center shrink-0">
+                        <ToolIcon id={tool.id} />
+                      </span>
+                      <span className="font-heading text-base sm:text-lg font-bold text-[#E8E4DE]">
+                        {tool.name}
+                      </span>
+                    </div>
+                    <span className="font-mono text-[10px] px-2.5 py-0.5 bg-[#191919] border border-[#33302D] text-[#F3A45B] uppercase">
+                      {tool.role}
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#A7A19A] leading-relaxed">
+                    {tool.desc}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Column (5 cols): Practical Areas of Specialization */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-3.5">
+            <div className="font-mono text-[11px] text-[#E87935] uppercase tracking-wider">
+              Areas of Specialization
+            </div>
+            <div className="p-5 bg-[#101010] border border-[#33302D] flex-1 flex flex-col justify-between space-y-4">
+              <ul className="space-y-3">
+                {AI_ENGINEERING_DATA.specializations.map((spec) => (
+                  <li
+                    key={spec}
+                    className="flex items-start gap-2.5 text-xs sm:text-sm text-[#E8E4DE]"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-[#E87935] shrink-0 mt-0.5" />
+                    <span className="leading-snug">{spec}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="pt-3.5 border-t border-[#33302D] font-mono text-[11px] text-[#A7A19A] leading-relaxed">
+                Applied practically across daily coding, debugging, system
+                planning, and documentation workflows.
+              </div>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+
+      {/* SECONDARY SUBSECTION 2: VIDEO EDITING & CREATIVE PRODUCTION TOOLS */}
+      <Reveal className="mt-6 sm:mt-8 bg-[#191919] border border-[#33302D] p-5 sm:p-7">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#33302D] pb-4 mb-5">
+          <div>
+            <div className="font-mono text-[11px] text-[#A7A19A] uppercase tracking-wider">
+              {CREATIVE_TOOLS_DATA.tag}
+            </div>
+            <h3 className="font-heading text-lg sm:text-xl font-bold text-[#E8E4DE] mt-0.5">
+              {CREATIVE_TOOLS_DATA.title}
+            </h3>
+          </div>
+          <span className="font-mono text-[10px] px-2.5 py-1 bg-[#101010] border border-[#33302D] text-[#A7A19A] self-start sm:self-center shrink-0 uppercase">
+            Supporting Media Capabilities
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          {CREATIVE_TOOLS_DATA.tools.map((tool) => (
+            <motion.div
+              key={tool.id}
+              whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+              transition={{
+                duration: MOTION_TOKENS.fast,
+                ease: MOTION_TOKENS.ease,
+              }}
+              className="p-4 bg-[#101010] border border-[#33302D] hover:border-[#E87935]/50 transition-colors flex flex-col justify-between gap-2"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 bg-[#191919] border border-[#33302D] flex items-center justify-center shrink-0">
+                    <ToolIcon id={tool.id} />
+                  </span>
+                  <span className="font-heading text-sm sm:text-base font-bold text-[#E8E4DE]">
+                    {tool.name}
+                  </span>
+                </div>
+                <span
+                  className={`font-mono text-[10px] px-2 py-0.5 border shrink-0 ${
+                    tool.level === 'Familiar'
+                      ? 'bg-[#242220] border-[#E87935]/50 text-[#F3A45B]'
+                      : 'bg-[#191919] border-[#33302D] text-[#A7A19A]'
+                  }`}
+                >
+                  {tool.name} — {tool.level}
+                </span>
+              </div>
+              <p className="text-xs text-[#A7A19A] leading-relaxed">
+                {tool.desc}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </Reveal>
     </section>
   );
 }

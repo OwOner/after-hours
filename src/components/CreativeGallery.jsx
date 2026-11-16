@@ -6,7 +6,7 @@ import {
   createFadeUpVariant,
   Reveal,
 } from '../utils/motion.jsx';
-import { CREATIVE_WORKS } from '../data/portfolioData.js';
+import { CREATIVE_WORKS, CREATIVE_TOOLS_DATA } from '../data/portfolioData.js';
 
 export default function CreativeGallery({ onSelectVideo }) {
   const prefersReducedMotion = useReducedMotion();
@@ -109,6 +109,24 @@ export default function CreativeGallery({ onSelectVideo }) {
             </motion.button>
           ))}
         </motion.div>
+
+        {/* Compact Production Tools Strip */}
+        <div className="mt-8 pt-6 border-t border-[#33302D] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="font-mono text-xs text-[#A7A19A] uppercase tracking-wider">
+            Creative Software & Editing Tools
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {CREATIVE_TOOLS_DATA.tools.map((tool) => (
+              <span
+                key={tool.id}
+                className="font-mono text-xs px-3 py-1.5 bg-[#101010] border border-[#33302D] text-[#E8E4DE]"
+              >
+                {tool.name}{' '}
+                <span className="text-[#E87935]">— {tool.level}</span>
+              </span>
+            ))}
+          </div>
+        </div>
       </Reveal>
     </section>
   );

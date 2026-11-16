@@ -1,5 +1,9 @@
 # AFTERHOURS Public Assets Directory
 
+Included production assets:
+- `public/og-image.png` — `1200 × 630` Open Graph & Twitter/X social preview image (`#101010` dark surface, `#E87935` accent, `JP.DEV` branding, `SOFTWARE DEVELOPER` headline, and isometric architectural portal map).
+- `public/favicon.svg` — Vector browser tab icon matching the `JP.DEV` rotated orange diamond monogram.
+
 Drop your real media and document assets into the following paths to replace the temporary conceptual placeholders automatically:
 
 1. **Resume PDF:**

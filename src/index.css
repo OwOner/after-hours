@@ -2,10 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* --- CENTRALIZED DUAL THEME DESIGN SYSTEM --- */
+
+:root,
+html[data-theme='dark'] {
   --font-heading: 'Space Grotesk', sans-serif;
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+
+  /* Dark Mode Palette (Original Nighttime Developer Workspace) */
+  --ah-bg: #101010;
+  --ah-bg-sub: #141312;
+  --ah-surface: #191919;
+  --ah-elevated: #242220;
+  --ah-text: #E8E4DE;
+  --ah-muted: #A7A19A;
+  --ah-muted-strong: #B8B0A6;
+  --ah-accent: #E87935;
+  --ah-accent-secondary: #F3A45B;
+  --ah-border: #33302D;
+  --ah-on-accent: #101010;
+  color-scheme: dark;
+}
+
+html[data-theme='light'] {
+  /* Light Mode Palette (Warm Architectural Paper Counterpart) */
+  --ah-bg: #F1EEE7;
+  --ah-bg-sub: #EAE4D9;
+  --ah-surface: #E5E0D6;
+  --ah-elevated: #FAF8F3;
+  --ah-text: #27231F;
+  --ah-muted: #71685E;
+  --ah-muted-strong: #585047;
+  --ah-accent: #C65E24;
+  --ah-accent-secondary: #E87935;
+  --ah-border: #D1C8BA;
+  --ah-on-accent: #FAF8F3;
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--ah-bg);
+  color: var(--ah-text);
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease;
 }
 
 .font-heading {
@@ -20,7 +61,230 @@
   font-family: var(--font-mono);
 }
 
+/* --- LIGHT MODE TOKEN MAPPING ACROSS PORTFOLIO, MODALS & EASTER EGGS --- */
+
+html[data-theme='light'] .bg-\[\#101010\],
+html[data-theme='light'] .bg-\[\#0b0b0b\] {
+  background-color: var(--ah-bg) !important;
+}
+
+html[data-theme='light'] .bg-\[\#101010\]\/85,
+html[data-theme='light'] .bg-\[\#101010\]\/90,
+html[data-theme='light'] .bg-\[\#101010\]\/92,
+html[data-theme='light'] .bg-\[\#101010\]\/94,
+html[data-theme='light'] .bg-\[\#101010\]\/95,
+html[data-theme='light'] .bg-\[\#101010\]\/96,
+html[data-theme='light'] .bg-\[\#101010\]\/80 {
+  background-color: rgba(241, 238, 231, 0.93) !important;
+}
+
+html[data-theme='light'] .bg-\[\#101010\]\/30 {
+  background-color: rgba(241, 238, 231, 0.55) !important;
+}
+
+html[data-theme='light'] .bg-\[\#141312\],
+html[data-theme='light'] .bg-\[\#141312\]\/95 {
+  background-color: var(--ah-bg-sub) !important;
+}
+
+html[data-theme='light'] .bg-\[\#191919\],
+html[data-theme='light'] .bg-\[\#191919\]\/90,
+html[data-theme='light'] .bg-\[\#191919\]\/95,
+html[data-theme='light'] .bg-\[\#191919\]\/96 {
+  background-color: var(--ah-surface) !important;
+}
+
+html[data-theme='light'] .hover\:bg-\[\#191919\]:hover {
+  background-color: var(--ah-surface) !important;
+}
+
+html[data-theme='light'] .bg-\[\#242220\],
+html[data-theme='light'] .bg-\[\#242220\]\/50,
+html[data-theme='light'] .hover\:bg-\[\#242220\]:hover {
+  background-color: var(--ah-elevated) !important;
+}
+
+html[data-theme='light'] .text-\[\#E8E4DE\],
+html[data-theme='light'] .text-\[\#E8E4DE\]\/90,
+html[data-theme='light'] .hover\:text-\[\#E8E4DE\]:hover {
+  color: var(--ah-text) !important;
+}
+
+html[data-theme='light'] .text-\[\#A7A19A\] {
+  color: var(--ah-muted) !important;
+}
+
+html[data-theme='light'] .text-\[\#B8B0A6\] {
+  color: var(--ah-muted-strong) !important;
+}
+
+html[data-theme='light'] .placeholder\:text-\[\#A7A19A\]\/40::placeholder,
+html[data-theme='light'] .placeholder\:text-\[\#A7A19A\]\/50::placeholder {
+  color: rgba(113, 104, 94, 0.65) !important;
+}
+
+html[data-theme='light'] .text-\[\#E87935\],
+html[data-theme='light'] .hover\:text-\[\#E87935\]:hover,
+html[data-theme='light'] .group:hover .group-hover\:text-\[\#E87935\] {
+  color: var(--ah-accent) !important;
+}
+
+html[data-theme='light'] .text-\[\#F3A45B\],
+html[data-theme='light'] .hover\:text-\[\#F3A45B\]:hover {
+  color: var(--ah-accent-secondary) !important;
+}
+
+html[data-theme='light'] .bg-\[\#E87935\],
+html[data-theme='light'] .hover\:bg-\[\#E87935\]:hover,
+html[data-theme='light'] .group:hover .group-hover\:bg-\[\#E87935\] {
+  background-color: var(--ah-accent) !important;
+}
+
+html[data-theme='light'] .hover\:bg-\[\#F3A45B\]:hover {
+  background-color: var(--ah-accent-secondary) !important;
+}
+
+html[data-theme='light'] .bg-\[\#E87935\].text-\[\#101010\],
+html[data-theme='light'] .hover\:bg-\[\#E87935\]:hover.hover\:text-\[\#101010\]:hover,
+html[data-theme='light'] .group:hover .group-hover\:text-\[\#101010\] {
+  color: var(--ah-on-accent) !important;
+}
+
+html[data-theme='light'] .border-\[\#33302D\],
+html[data-theme='light'] .border-\[\#33302D\]\/60,
+html[data-theme='light'] .border-\[\#33302D\]\/70,
+html[data-theme='light'] .border-\[\#33302D\]\/80 {
+  border-color: var(--ah-border) !important;
+}
+
+html[data-theme='light'] .border-\[\#33302D\]\/35 {
+  border-color: rgba(209, 200, 186, 0.55) !important;
+}
+
+html[data-theme='light'] .divide-\[\#33302D\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--ah-border) !important;
+}
+
+html[data-theme='light'] .border-\[\#E87935\],
+html[data-theme='light'] .hover\:border-\[\#E87935\]:hover {
+  border-color: var(--ah-accent) !important;
+}
+
+html[data-theme='light'] .border-\[\#E87935\]\/30,
+html[data-theme='light'] .border-\[\#E87935\]\/35,
+html[data-theme='light'] .border-\[\#E87935\]\/40,
+html[data-theme='light'] .border-\[\#E87935\]\/50,
+html[data-theme='light'] .border-\[\#E87935\]\/60,
+html[data-theme='light'] .border-\[\#E87935\]\/70,
+html[data-theme='light'] .border-\[\#E87935\]\/80 {
+  border-color: rgba(198, 94, 36, 0.55) !important;
+}
+
+/* Secret Terminal & Status Readability in Light Mode */
+html[data-theme='light'] .text-\[\#7DAF82\] {
+  color: #2D6A3E !important;
+}
+
+html[data-theme='light'] .text-emerald-400 {
+  color: #15803D !important;
+}
+
+html[data-theme='light'] .text-red-400 {
+  color: #B91C1C !important;
+}
+
+/* Warm Architectural Shadows & Modal Backdrops in Light Mode */
+html[data-theme='light'] .bg-black\/75,
+html[data-theme='light'] .bg-black\/80,
+html[data-theme='light'] .bg-black\/85 {
+  background-color: rgba(39, 35, 31, 0.52) !important;
+}
+
+html[data-theme='light'] .shadow-2xl,
+html[data-theme='light'] .shadow-xl,
+html[data-theme='light'] .shadow-\[0_25px_70px_rgba\(0\,0\,0\,0\.75\)\],
+html[data-theme='light'] .shadow-\[0_24px_60px_rgba\(0\,0\,0\,0\.9\)\],
+html[data-theme='light'] .shadow-\[0_20px_50px_rgba\(0\,0\,0\,0\.88\)\],
+html[data-theme='light'] .shadow-\[0_12px_35px_rgba\(0\,0\,0\,0\.85\)\] {
+  box-shadow: 0 18px 45px rgba(39, 35, 31, 0.13) !important;
+}
+
+/* --- LIGHTWEIGHT GPU-ACCELERATED "LIGHT SWEEP" THEME TRANSITION --- */
+
+@keyframes ahLightSweepRight {
+  0% {
+    transform: translate3d(-120%, 0, 0) skewX(-14deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(260%, 0, 0) skewX(-14deg);
+    opacity: 0;
+  }
+}
+
+@keyframes ahLightSweepLeft {
+  0% {
+    transform: translate3d(260%, 0, 0) skewX(-14deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(-120%, 0, 0) skewX(-14deg);
+    opacity: 0;
+  }
+}
+
+.ah-light-sweep-beam {
+  position: absolute;
+  top: -10%;
+  left: 0;
+  width: 42vw;
+  min-width: 260px;
+  height: 120%;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.ah-light-sweep-to-light {
+  background: linear-gradient(
+    90deg,
+    rgba(198, 94, 36, 0) 0%,
+    rgba(232, 121, 53, 0.14) 38%,
+    rgba(232, 121, 53, 0.48) 50%,
+    rgba(250, 248, 243, 0.38) 54%,
+    rgba(198, 94, 36, 0) 100%
+  );
+  animation: ahLightSweepRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.ah-light-sweep-to-dark {
+  background: linear-gradient(
+    270deg,
+    rgba(232, 121, 53, 0) 0%,
+    rgba(232, 121, 53, 0.12) 38%,
+    rgba(232, 121, 53, 0.45) 50%,
+    rgba(243, 164, 91, 0.32) 54%,
+    rgba(232, 121, 53, 0) 100%
+  );
+  animation: ahLightSweepLeft 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .ah-light-sweep-beam {
+    display: none !important;
+    animation: none !important;
+  }
   *,
   ::before,
   ::after {

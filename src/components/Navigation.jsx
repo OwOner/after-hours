@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 import { MOTION_TOKENS } from '../utils/motion.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 
 const NAV_ITEMS = [
   { id: 'work', label: 'Work' },
@@ -94,8 +95,10 @@ export default function Navigation({
           })}
         </nav>
 
-        {/* Right Action / Mobile Trigger */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        {/* Right Action / Theme Toggle / Mobile Trigger */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <ThemeToggle variant="nav" />
+
           <motion.button
             type="button"
             whileHover={prefersReducedMotion ? undefined : { y: -2 }}

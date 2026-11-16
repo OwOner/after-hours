@@ -1,14 +1,72 @@
 <!doctype html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en" data-theme="dark" class="dark scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Document Metadata -->
+    <title>JP | Software Developer</title>
     <meta
       name="description"
-      content="JP.DEV — Software, Web & Desktop Application Developer based in Sorsogon, Philippines. Building reliable digital products, database systems, and creative digital media."
+      content="Explore the portfolio of a software developer from the Philippines, featuring web applications, desktop software, technical projects, and creative work."
     />
     <meta name="theme-color" content="#101010" />
-    <title>JP.DEV // AFTERHOURS — Software Developer Portfolio</title>
+    <link rel="canonical" href="%SITE_URL%/" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph / Social Sharing Metadata -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="JP.DEV // AFTERHOURS" />
+    <meta property="og:title" content="JP | Software Developer" />
+    <meta
+      property="og:description"
+      content="Explore the portfolio of a software developer from the Philippines, featuring web applications, desktop software, technical projects, and creative work."
+    />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:image" content="%SITE_URL%/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="JP.DEV — Software Developer Portfolio (Web Applications, Desktop Software, Creative Media)"
+    />
+
+    <!-- Twitter / X Card Metadata -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="JP | Software Developer" />
+    <meta
+      name="twitter:description"
+      content="Explore the portfolio of a software developer from the Philippines, featuring web applications, desktop software, technical projects, and creative work."
+    />
+    <meta name="twitter:image" content="%SITE_URL%/og-image.png" />
+    <meta
+      name="twitter:image:alt"
+      content="JP.DEV — Software Developer Portfolio (Web Applications, Desktop Software, Creative Media)"
+    />
+
+    <!-- Synchronous Theme Restore (Prevents Flash of Incorrect Theme on Load) -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('afterhours-theme');
+          var theme = saved === 'light' || saved === 'dark' ? saved : 'dark';
+          var root = document.documentElement;
+          root.setAttribute('data-theme', theme);
+          root.classList.toggle('dark', theme === 'dark');
+          root.classList.toggle('light', theme === 'light');
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) {
+            meta.setAttribute(
+              'content',
+              theme === 'light' ? '#F1EEE7' : '#101010',
+            );
+          }
+        } catch {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
 
     <!-- Optimized Google Fonts Loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,4 +81,3 @@
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
-

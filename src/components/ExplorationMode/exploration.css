@@ -1,4 +1,4 @@
-/* AFTERHOURS // EXPLORATION MODE — PHASE 2 STYLES & ARRIVAL EFFECTS */
+/* AFTERHOURS // EXPLORATION MODE — DUAL THEME STYLES & ARRIVAL EFFECTS */
 
 .exploration-viewport {
   background:
@@ -7,11 +7,26 @@
     #0b0b0b;
 }
 
+html[data-theme='light'] .exploration-viewport {
+  background:
+    radial-gradient(circle at 50% 44%, rgba(198, 94, 36, 0.11) 0%, rgba(241, 238, 231, 0) 66%),
+    radial-gradient(circle at 20% 80%, rgba(232, 121, 53, 0.06) 0%, rgba(241, 238, 231, 0) 52%),
+    #F1EEE7;
+}
+
 .exploration-vignette {
   background: radial-gradient(
     circle at 50% 50%,
     transparent 54%,
     rgba(10, 10, 10, 0.82) 100%
+  );
+}
+
+html[data-theme='light'] .exploration-vignette {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 58%,
+    rgba(214, 206, 193, 0.65) 100%
   );
 }
 
@@ -100,9 +115,9 @@ section[data-arrival-section='true']::before {
   background: linear-gradient(
     90deg,
     rgba(232, 121, 53, 0) 0%,
-    #E87935 30%,
-    #F3A45B 50%,
-    #E87935 70%,
+    var(--ah-accent) 30%,
+    var(--ah-accent-secondary) 50%,
+    var(--ah-accent) 70%,
     rgba(232, 121, 53, 0) 100%
   );
   box-shadow: 0 0 22px rgba(232, 121, 53, 0.85);

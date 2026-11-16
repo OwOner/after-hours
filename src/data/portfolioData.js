@@ -8,9 +8,9 @@ import { Layout, Cpu, Database, Code2, Wrench } from 'lucide-react';
  * No email addresses, URLs, or backend credentials are invented.
  */
 export const SITE_CONFIG = {
-  // Set VITE_CONTACT_EMAIL in .env or replace '' with your verified email address (e.g., "you@example.com")
-  contactEmail: import.meta.env.VITE_CONTACT_EMAIL || '',
-  contactEmailPlaceholder: 'YOUR_EMAIL_HERE (Configure VITE_CONTACT_EMAIL in .env)',
+  // Verified contact email address
+  contactEmail: import.meta.env.VITE_CONTACT_EMAIL || 'espanojohnpaul28@gmail.com',
+  contactEmailPlaceholder: 'espanojohnpaul28@gmail.com',
   // Optional future backend endpoint (e.g., Web3Forms / Formspree URL)
   contactEndpoint: import.meta.env.VITE_CONTACT_ENDPOINT || '',
   // Verified social profile links (configure in .env or here when ready)
@@ -263,6 +263,68 @@ export const EXPERTISE_CATEGORIES = [
     ],
   },
 ];
+
+export const AI_ENGINEERING_DATA = {
+  tag: 'AI WORKFLOWS // PRACTICAL DEVELOPMENT INTEGRATION',
+  title: 'AI-Assisted Software Development',
+  subtitle:
+    'I use AI as a practical development tool to improve my workflow across debugging, architecture planning, and documentation—always grounded in software engineering fundamentals rather than as a replacement for understanding them.',
+  tools: [
+    {
+      id: 'chatgpt',
+      name: 'ChatGPT',
+      role: 'Core Assistant',
+      desc: 'Technical problem-solving, code assistance, debugging, architecture discussions, planning, and documentation.',
+    },
+    {
+      id: 'gemini',
+      name: 'Google Gemini',
+      role: 'Research & Analysis',
+      desc: 'Research assistance, brainstorming, analysis, and development support.',
+    },
+    {
+      id: 'claude',
+      name: 'Claude',
+      role: 'Code & Reasoning',
+      desc: 'Coding assistance, reviewing implementations, reasoning through technical problems, and improving development workflows.',
+    },
+  ],
+  specializations: [
+    'AI-Assisted Software Development',
+    'Prompt Engineering and Context Management',
+    'AI-Supported Debugging and Problem Solving',
+    'Software Architecture Planning with AI Assistance',
+    'Rapid Prototyping and Development Workflows',
+    'AI-Assisted Research and Technical Documentation',
+  ],
+};
+
+export const CREATIVE_TOOLS_DATA = {
+  tag: 'SECONDARY SKILL // CREATIVE PRODUCTION',
+  title: 'Video Editing & Creative Tools',
+  subtitle:
+    'Supporting tools used for video editing, social media cuts, and 360-degree footage processing alongside my primary software development work.',
+  tools: [
+    {
+      id: 'davinci-resolve',
+      name: 'DaVinci Resolve',
+      level: 'Beginner',
+      desc: 'Basic familiarity; still developing proficiency.',
+    },
+    {
+      id: 'capcut',
+      name: 'CapCut',
+      level: 'Beginner',
+      desc: 'Basic familiarity; still developing proficiency.',
+    },
+    {
+      id: 'insta360-studio',
+      name: 'Insta360 Studio',
+      level: 'Familiar',
+      desc: 'Experience with editing and processing 360-degree footage.',
+    },
+  ],
+};
 
 export const TIMELINE_DATA = [
   {

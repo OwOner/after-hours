@@ -8,19 +8,18 @@ import {
 } from 'lucide-react';
 
 /**
- * Reusable 5-Phase Cinematic Transition Timings (in milliseconds)
- * - Phase A (Selection Lock):  0 - 120ms
- * - Phase B (Impact Frame):    120 - 220ms
- * - Phase C (Camera Punch-In): 220 - 700ms
- * - Phase D (Transition Cut):  700 - 950ms
- * - Phase E (Portfolio Arrival): 950ms
+ * Coordinated 4-Phase Destination Entry Timeline (in milliseconds)
+ * - Phase 1 (Destination Lock):  170ms (target: 150-200ms)
+ * - Phase 2 (Camera Approach):   740ms (target: 650-900ms)
+ * - Phase 3 (Arrival Impact):    160ms (target: 120-200ms — starts ONLY after camera approach completes)
+ * - Phase 4 (Section Reveal):    340ms (target: 300-450ms)
  */
 export const TRANSITION_TIMINGS = {
-  lockDuration: 120,
-  impactDuration: 100,
-  punchDuration: 480,
-  cutDuration: 250,
-  reducedMotionTotal: 220,
+  lockDuration: 170,
+  approachDuration: 740,
+  impactDuration: 160,
+  revealDuration: 340,
+  reducedMotionTotal: 240,
 };
 
 /**
