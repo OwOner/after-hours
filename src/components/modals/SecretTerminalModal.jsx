@@ -84,7 +84,6 @@ export default function SecretTerminalModal({
             '01. Nexus Payroll  (Next.js, TypeScript, Supabase) — Flagship',
             '02. Universal POS  (Electron, React, SQLite, TypeScript) — Flagship',
             '03. SmartSpend     (React, TypeScript, Supabase) — Supporting',
-            '+   Payment Workflow Contribution (Web Construction Platform)',
           ].join('\n'),
         });
         break;

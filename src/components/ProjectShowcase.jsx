@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, Eye, Github, ExternalLink } from 'lucide-react';
 import { MOTION_TOKENS, Reveal } from '../utils/motion.jsx';
-import { PROJECTS, ADDITIONAL_CONTRIBUTIONS } from '../data/portfolioData.js';
+import { PROJECTS } from '../data/portfolioData.js';
 import ProjectStageCanvas from './ProjectStageCanvas.jsx';
 
 export default function ProjectShowcase({ onSelectProject }) {
@@ -223,33 +223,6 @@ export default function ProjectShowcase({ onSelectProject }) {
           );
         })}
       </div>
-
-      {/* Focused Feature & Workflow Contributions (Accurate Scope Acknowledgment) */}
-      <Reveal className="mt-20 sm:mt-24 pt-10 sm:pt-12 border-t border-[#33302D]">
-        <motion.div
-          whileHover={prefersReducedMotion ? undefined : { y: -3 }}
-          transition={{
-            duration: MOTION_TOKENS.standard,
-            ease: MOTION_TOKENS.ease,
-          }}
-          className="bg-[#191919] border border-[#33302D] hover:border-[#E87935]/50 transition-colors p-6 sm:p-10 flex flex-col md:flex-row md:items-center justify-between gap-6"
-        >
-          <div className="space-y-2 max-w-2xl">
-            <div className="font-mono text-xs text-[#E87935] uppercase tracking-widest">
-              ADDITIONAL FEATURE CONTRIBUTION
-            </div>
-            <h3 className="font-heading text-2xl font-bold text-[#E8E4DE]">
-              {ADDITIONAL_CONTRIBUTIONS[0].title}
-            </h3>
-            <p className="text-sm sm:text-base text-[#A7A19A] leading-relaxed">
-              {ADDITIONAL_CONTRIBUTIONS[0].description}
-            </p>
-          </div>
-          <div className="font-mono text-xs px-4 py-2.5 bg-[#101010] border border-[#33302D] text-[#F3A45B] shrink-0 self-start md:self-center">
-            Scope: Payment Process Module
-          </div>
-        </motion.div>
-      </Reveal>
     </section>
   );
 }

@@ -114,15 +114,6 @@ export const PROJECTS = [
   },
 ];
 
-export const ADDITIONAL_CONTRIBUTIONS = [
-  {
-    title: 'Payment Workflow Contribution',
-    context: 'Web-Based Construction Platform',
-    description:
-      'Contributed to the payment process of a web-based construction platform, focusing on the payment-related workflow.',
-  },
-];
-
 export const EXPERTISE_CATEGORIES = [
   {
     id: 'frontend',
