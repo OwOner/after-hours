@@ -13,6 +13,7 @@ import ExperienceTimeline from './components/ExperienceTimeline.jsx';
 import CreativeGallery from './components/CreativeGallery.jsx';
 import Contact from './components/Contact.jsx';
 import Footer from './components/Footer.jsx';
+import ExplorationMode from './components/ExplorationMode/ExplorationMode.jsx';
 
 import ProjectCaseStudyModal from './components/modals/ProjectCaseStudyModal.jsx';
 import VideoPreviewModal from './components/modals/VideoPreviewModal.jsx';
@@ -37,6 +38,7 @@ export default function App() {
   // Navigation & Scroll State
   const [activeSection, setActiveSection] = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [explorationOpen, setExplorationOpen] = useState(false);
 
   // Modals & Interactive States
   const [selectedProject, setSelectedProject] = useState(null);
@@ -105,7 +107,8 @@ export default function App() {
       contactModalOpen ||
       terminalOpen ||
       arcadeOpen ||
-      dungeonOpen,
+      dungeonOpen ||
+      explorationOpen,
   );
 
   useEffect(() => {
@@ -252,6 +255,14 @@ export default function App() {
       {/* FOOTER WITH SUBTLE SECRET TERMINAL TRIGGER */}
       <Footer onOpenTerminal={() => setTerminalOpen(true)} />
 
+      {/* AFTERHOURS // EXPLORATION MODE (3D ISOMETRIC WORLD + PORTAL NAVIGATION) */}
+      <ExplorationMode
+        isOpen={explorationOpen}
+        onOpen={() => setExplorationOpen(true)}
+        onClose={() => setExplorationOpen(false)}
+        onNavigateToSection={scrollToSection}
+      />
+
       {/* TOAST NOTIFICATION (RESUME / UNCONFIGURED PROFILE NOTICE) */}
       <AnimatePresence>
         {toastNotification && (
@@ -265,7 +276,7 @@ export default function App() {
               duration: MOTION_TOKENS.standard,
               ease: MOTION_TOKENS.ease,
             }}
-            className="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 z-50 bg-[#191919] border border-[#E87935] p-4 shadow-2xl sm:max-w-sm flex items-start justify-between gap-3"
+            className="fixed bottom-16 right-4 left-4 sm:left-auto sm:bottom-20 sm:right-6 z-50 bg-[#191919] border border-[#E87935] p-4 shadow-2xl sm:max-w-sm flex items-start justify-between gap-3"
           >
             <div className="flex items-start gap-3">
               {toastNotification.tone === 'success' ? (

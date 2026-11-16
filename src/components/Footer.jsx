@@ -6,7 +6,7 @@ export default function Footer({ onOpenTerminal }) {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <footer className="relative z-10 border-t border-[#33302D] bg-[#101010] py-10 px-4 sm:px-8">
+    <footer className="relative z-10 border-t border-[#33302D] bg-[#101010] pt-10 pb-20 sm:pb-16 px-4 sm:px-8">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <span className="w-2 h-2 bg-[#E87935] rotate-45" />
