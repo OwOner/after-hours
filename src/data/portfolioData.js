@@ -16,7 +16,7 @@ export const SITE_CONFIG = {
   // Profile photo
   profilePhotoUrl: import.meta.env.VITE_PROFILE_PHOTO_URL || '/images/jp.jpg',
   // Verified social profile links (configure in .env or here when ready)
-  githubUrl: import.meta.env.VITE_GITHUB_URL || '',
+  githubUrl: import.meta.env.VITE_GITHUB_URL || 'https://github.com/OwOner',
   linkedinUrl:
     import.meta.env.VITE_LINKEDIN_URL ||
     'https://www.linkedin.com/in/brave-black-bb39143ba/',

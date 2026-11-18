@@ -207,8 +207,12 @@ export default function App() {
           />
         </main>
 
-        {/* FOOTER WITH SUBTLE SECRET TERMINAL TRIGGER */}
-        <Footer onOpenTerminal={() => setTerminalOpen(true)} />
+        {/* FOOTER */}
+        <Footer
+          onOpenTerminal={() => setTerminalOpen(true)}
+          onOpenContactModal={() => setContactModalOpen(true)}
+          scrollToSection={scrollToSection}
+        />
 
         {/* AFTERHOURS // EXPLORATION MODE (3D ISOMETRIC WORLD + PORTAL NAVIGATION) */}
         <ExplorationMode
