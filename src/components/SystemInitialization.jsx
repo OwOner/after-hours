@@ -16,7 +16,7 @@ const ISOMETRIC_NODES = [
   { id: 'n2', label: 'SKILLS', x: 350, y: 66, w: 28, h: 24 },
   { id: 'n3', label: 'ABOUT', x: 435, y: 148, w: 30, h: 28 },
   { id: 'n4', label: 'EXPERIENCE', x: 355, y: 226, w: 34, h: 24 },
-  { id: 'n5', label: 'CREATIVE', x: 195, y: 234, w: 30, h: 22 },
+  { id: 'n5', label: 'SYSTEMS', x: 195, y: 234, w: 30, h: 22 },
   { id: 'n6', label: 'CONTACT', x: 115, y: 162, w: 28, h: 26 },
 ];
 

@@ -4,7 +4,10 @@ import { ChevronRight } from 'lucide-react';
 import { MOTION_TOKENS } from '../utils/motion.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
 
-const NAV_ITEMS = [
+// Set to true to restore Creative navigation
+const SHOW_CREATIVE_NAV = false;
+
+const ALL_NAV_ITEMS = [
   { id: 'work', label: 'Work' },
   { id: 'expertise', label: 'Expertise' },
   { id: 'about', label: 'About' },
@@ -12,13 +15,21 @@ const NAV_ITEMS = [
   { id: 'contact', label: 'Contact' },
 ];
 
-const MOBILE_NAV_ITEMS = [
+const ALL_MOBILE_NAV_ITEMS = [
   { id: 'work', label: 'Work' },
   { id: 'expertise', label: 'Expertise' },
   { id: 'about', label: 'About & Experience' },
   { id: 'creative', label: 'Creative' },
   { id: 'contact', label: 'Contact' },
 ];
+
+const NAV_ITEMS = ALL_NAV_ITEMS.filter(
+  (item) => item.id !== 'creative' || SHOW_CREATIVE_NAV,
+);
+
+const MOBILE_NAV_ITEMS = ALL_MOBILE_NAV_ITEMS.filter(
+  (item) => item.id !== 'creative' || SHOW_CREATIVE_NAV,
+);
 
 export default function Navigation({
   activeSection,

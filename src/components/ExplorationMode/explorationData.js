@@ -28,7 +28,7 @@ export const TRANSITION_TIMINGS = {
  * All 6 destinations map to the exact existing portfolio section IDs while
  * using clear, natural language for visitors, clients, and recruiters.
  */
-export const EXPLORATION_LOCATIONS = [
+export const ALL_EXPLORATION_LOCATIONS = [
   {
     id: 'server-complex',
     sectionId: 'work',
@@ -47,9 +47,9 @@ export const EXPLORATION_LOCATIONS = [
     summary:
       "Take a closer look at the software applications and digital solutions I've worked on.",
     highlights: [
-      'Nexus Payroll — Enterprise payroll management system',
       'Universal POS — Desktop point-of-sale application',
-      'SmartSpend — Personal expense tracking application',
+      'Go Green Solar Simulator — Interactive solar simulation tool',
+      '151 Street Café POS & Website — Café operations & brand suite',
     ],
   },
   {
@@ -124,6 +124,7 @@ export const EXPLORATION_LOCATIONS = [
   {
     id: 'media-station',
     sectionId: 'creative',
+    visible: false, // Hidden temporarily with Videos section; flip to true to restore
     code: '05',
     categoryLabel: 'VIDEO & DIGITAL MEDIA',
     name: 'Creative Work',
@@ -160,14 +161,18 @@ export const EXPLORATION_LOCATIONS = [
     accent: '#E87935',
     secondaryAccent: '#38BDF8',
     summary:
-      'Get in touch for software development inquiries, project collaborations, or to download my resume.',
+      'Get in touch for software development inquiries, project collaborations, and professional opportunities.',
     highlights: [
       'Direct message form and copyable email address',
-      'Downloadable resume PDF',
-      'GitHub and LinkedIn profile channels',
+      'Verified LinkedIn professional profile channel',
+      'Fast communication for software engineering opportunities',
     ],
   },
 ];
+
+export const EXPLORATION_LOCATIONS = ALL_EXPLORATION_LOCATIONS.filter(
+  (loc) => loc.visible !== false,
+);
 
 /**
  * Pathways connecting the Central Core (0,0,0) to each sector platform

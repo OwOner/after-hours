@@ -1,8 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { CheckCircle2, Info, X } from 'lucide-react';
-import { MOTION_TOKENS } from './utils/motion.jsx';
-import { SITE_CONFIG } from './data/portfolioData.js';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 
 import Navigation from './components/Navigation.jsx';
@@ -24,13 +21,16 @@ import SecretTerminalModal from './components/modals/SecretTerminalModal.jsx';
 import ArcadeModal from './components/modals/ArcadeModal.jsx';
 import DungeonModal from './components/modals/DungeonModal.jsx';
 
+// Visibility flag for Videos / Creative Work section (flip to true to restore)
+const SHOW_CREATIVE_SECTION = false;
+
 const SECTION_IDS = [
   'hero',
   'work',
   'expertise',
   'about',
   'experience',
-  'creative',
+  ...(SHOW_CREATIVE_SECTION ? ['creative'] : []),
   'contact',
 ];
 
@@ -46,8 +46,6 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [contactModalOpen, setContactModalOpen] = useState(false);
-  const [toastNotification, setToastNotification] = useState(null); // { title: string, message: string, tone: 'info' | 'success' }
-  const toastTimerRef = useRef(null);
   const arrivalTimerRef = useRef(null);
 
   // Easter Egg Modal States (Mutually exclusive to prevent backdrop stacking)
@@ -55,17 +53,8 @@ export default function App() {
   const [arcadeOpen, setArcadeOpen] = useState(false);
   const [dungeonOpen, setDungeonOpen] = useState(false);
 
-  const showToast = (title, message, tone = 'info') => {
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    setToastNotification({ title, message, tone });
-    toastTimerRef.current = setTimeout(() => {
-      setToastNotification(null);
-    }, 5000);
-  };
-
   useEffect(() => {
     return () => {
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       if (arrivalTimerRef.current) clearTimeout(arrivalTimerRef.current);
     };
   }, []);
@@ -107,12 +96,12 @@ export default function App() {
   // Prevent background scrolling when any modal is active
   const anyModalOpen = Boolean(
     selectedProject ||
-      selectedVideo ||
-      contactModalOpen ||
-      terminalOpen ||
-      arcadeOpen ||
-      dungeonOpen ||
-      explorationOpen,
+    selectedVideo ||
+    contactModalOpen ||
+    terminalOpen ||
+    arcadeOpen ||
+    dungeonOpen ||
+    explorationOpen,
   );
 
   useEffect(() => {
@@ -146,225 +135,133 @@ export default function App() {
     }
   };
 
-  // Real Resume PDF Download Check & Trigger
-  const triggerResumeDownload = async () => {
-    const resumeUrl = SITE_CONFIG.resumeUrl;
-    if (!resumeUrl) {
-      showToast(
-        'RESUME CONFIGURATION REQUIRED',
-        'Place your resume PDF at public/resume.pdf or set VITE_RESUME_URL in .env.',
-      );
-      return;
-    }
-
-    try {
-      const response = await fetch(resumeUrl, { method: 'HEAD' });
-      const contentType = response.headers.get('content-type') || '';
-      // Vite dev server returns text/html for missing files due to SPA fallback
-      if (response.ok && !contentType.includes('text/html')) {
-        const link = document.createElement('a');
-        link.href = resumeUrl;
-        link.download = SITE_CONFIG.resumeFilename || 'Resume.pdf';
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast(
-          'DOWNLOADING RESUME',
-          `Starting download for ${SITE_CONFIG.resumeFilename}.`,
-          'success',
-        );
-      } else {
-        showToast(
-          'RESUME PDF SLOT READY',
-          'Add your PDF file at public/resume.pdf (or set VITE_RESUME_URL in .env) to enable direct download.',
-        );
-      }
-    } catch {
-      showToast(
-        'RESUME PDF SLOT READY',
-        'Add your PDF file at public/resume.pdf (or set VITE_RESUME_URL in .env) to enable direct download.',
-      );
-    }
-  };
-
-  const handleNotifyUnconfiguredLink = (platform) => {
-    const envVar =
-      platform === 'GitHub' ? 'VITE_GITHUB_URL' : 'VITE_LINKEDIN_URL';
-    showToast(
-      `${platform.toUpperCase()} LINK CONFIGURATION`,
-      `Configure ${envVar} in .env or src/data/portfolioData.js with your verified ${platform} profile URL.`,
-    );
-  };
-
   return (
     <ThemeProvider>
       <SystemInitialization />
       <div className="min-h-screen bg-[#101010] text-[#E8E4DE] font-sans selection:bg-[#E87935] selection:text-[#101010] relative overflow-x-hidden">
-      {/* Keyboard Skip Link for Accessibility */}
-      <a
-        href="#work"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#E87935] focus:text-[#101010] focus:font-mono focus:text-xs focus:font-semibold"
-      >
-        Skip to main content
-      </a>
+        {/* Keyboard Skip Link for Accessibility */}
+        <a
+          href="#work"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#E87935] focus:text-[#101010] focus:font-mono focus:text-xs focus:font-semibold"
+        >
+          Skip to main content
+        </a>
 
-      {/* Subtle Ambient Atmospheric Background Glow */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <motion.div
-          animate={
-            prefersReducedMotion
-              ? undefined
-              : {
+        {/* Subtle Ambient Atmospheric Background Glow */}
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          <motion.div
+            animate={
+              prefersReducedMotion
+                ? undefined
+                : {
                   x: [0, 28, -16, 0],
                   y: [0, -22, 14, 0],
                   opacity: [0.05, 0.085, 0.05],
                 }
-          }
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -top-40 left-1/4 w-[520px] h-[520px] rounded-full blur-[130px]"
-          style={{
-            background:
-              'radial-gradient(circle, #E87935 0%, rgba(232,121,53,0) 70%)',
+            }
+            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute -top-40 left-1/4 w-[520px] h-[520px] rounded-full blur-[130px]"
+            style={{
+              background:
+                'radial-gradient(circle, #E87935 0%, rgba(232,121,53,0) 70%)',
+            }}
+          />
+        </div>
+
+        {/* Subtle Editorial Vertical Guide Lines */}
+        <div className="fixed inset-0 pointer-events-none z-0 max-w-7xl mx-auto border-x border-[#33302D]/35" />
+
+        {/* A. NAVIGATION */}
+        <Navigation
+          activeSection={activeSection}
+          mobileMenuOpen={mobileMenuOpen}
+          setMobileMenuOpen={setMobileMenuOpen}
+          scrollToSection={scrollToSection}
+        />
+
+        {/* MAIN CONTENT */}
+        <main id="main-content">
+          {/* B. HERO SECTION */}
+          <Hero scrollToSection={scrollToSection} />
+
+          {/* C. SELECTED PROJECTS */}
+          <ProjectShowcase onSelectProject={setSelectedProject} />
+
+          {/* D. TECHNICAL EXPERTISE */}
+          <Expertise />
+
+          {/* E. ABOUT ME */}
+          <About />
+
+          {/* F. EXPERIENCE & BACKGROUND */}
+          <ExperienceTimeline />
+
+          {/* G. CREATIVE WORK (HIDDEN TEMPORARILY - SET SHOW_CREATIVE_SECTION = true TO RESTORE) */}
+          {SHOW_CREATIVE_SECTION && (
+            <CreativeGallery onSelectVideo={setSelectedVideo} />
+          )}
+
+          {/* H. CONTACT SECTION */}
+          <Contact
+            onOpenContactModal={() => setContactModalOpen(true)}
+          />
+        </main>
+
+        {/* FOOTER WITH SUBTLE SECRET TERMINAL TRIGGER */}
+        <Footer onOpenTerminal={() => setTerminalOpen(true)} />
+
+        {/* AFTERHOURS // EXPLORATION MODE (3D ISOMETRIC WORLD + PORTAL NAVIGATION) */}
+        <ExplorationMode
+          isOpen={explorationOpen}
+          onOpen={() => setExplorationOpen(true)}
+          onClose={() => setExplorationOpen(false)}
+          onNavigateToSection={scrollToSection}
+        />
+
+        {/* MODALS */}
+        <ProjectCaseStudyModal
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+        />
+
+        {SHOW_CREATIVE_SECTION && (
+          <VideoPreviewModal
+            video={selectedVideo}
+            onClose={() => setSelectedVideo(null)}
+          />
+        )}
+
+        <ContactModal
+          isOpen={contactModalOpen}
+          onClose={() => setContactModalOpen(false)}
+        />
+
+        <SecretTerminalModal
+          isOpen={terminalOpen}
+          onClose={() => setTerminalOpen(false)}
+          onOpenArcade={() => {
+            setTerminalOpen(false);
+            setArcadeOpen(true);
+          }}
+          onOpenDungeon={() => {
+            setTerminalOpen(false);
+            setDungeonOpen(true);
           }}
         />
-      </div>
 
-      {/* Subtle Editorial Vertical Guide Lines */}
-      <div className="fixed inset-0 pointer-events-none z-0 max-w-7xl mx-auto border-x border-[#33302D]/35" />
-
-      {/* A. NAVIGATION */}
-      <Navigation
-        activeSection={activeSection}
-        mobileMenuOpen={mobileMenuOpen}
-        setMobileMenuOpen={setMobileMenuOpen}
-        scrollToSection={scrollToSection}
-      />
-
-      {/* MAIN CONTENT */}
-      <main id="main-content">
-        {/* B. HERO SECTION */}
-        <Hero scrollToSection={scrollToSection} />
-
-        {/* C. SELECTED PROJECTS */}
-        <ProjectShowcase onSelectProject={setSelectedProject} />
-
-        {/* D. TECHNICAL EXPERTISE */}
-        <Expertise />
-
-        {/* E. ABOUT ME */}
-        <About />
-
-        {/* F. EXPERIENCE & BACKGROUND */}
-        <ExperienceTimeline />
-
-        {/* G. CREATIVE WORK */}
-        <CreativeGallery onSelectVideo={setSelectedVideo} />
-
-        {/* H. CONTACT SECTION */}
-        <Contact
-          onOpenContactModal={() => setContactModalOpen(true)}
-          onTriggerResumeDownload={triggerResumeDownload}
-          onNotifyUnconfiguredLink={handleNotifyUnconfiguredLink}
+        <ArcadeModal
+          isOpen={arcadeOpen}
+          onClose={() => setArcadeOpen(false)}
+          onSwitchToDungeon={() => {
+            setArcadeOpen(false);
+            setDungeonOpen(true);
+          }}
         />
-      </main>
 
-      {/* FOOTER WITH SUBTLE SECRET TERMINAL TRIGGER */}
-      <Footer onOpenTerminal={() => setTerminalOpen(true)} />
-
-      {/* AFTERHOURS // EXPLORATION MODE (3D ISOMETRIC WORLD + PORTAL NAVIGATION) */}
-      <ExplorationMode
-        isOpen={explorationOpen}
-        onOpen={() => setExplorationOpen(true)}
-        onClose={() => setExplorationOpen(false)}
-        onNavigateToSection={scrollToSection}
-      />
-
-      {/* TOAST NOTIFICATION (RESUME / UNCONFIGURED PROFILE NOTICE) */}
-      <AnimatePresence>
-        {toastNotification && (
-          <motion.div
-            role="status"
-            aria-live="polite"
-            initial={{ opacity: 0, y: 20, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.97 }}
-            transition={{
-              duration: MOTION_TOKENS.standard,
-              ease: MOTION_TOKENS.ease,
-            }}
-            className="fixed bottom-16 right-4 left-4 sm:left-auto sm:bottom-20 sm:right-6 z-50 bg-[#191919] border border-[#E87935] p-4 shadow-2xl sm:max-w-sm flex items-start justify-between gap-3"
-          >
-            <div className="flex items-start gap-3">
-              {toastNotification.tone === 'success' ? (
-                <CheckCircle2 className="w-5 h-5 text-[#E87935] shrink-0 mt-0.5" />
-              ) : (
-                <Info className="w-5 h-5 text-[#E87935] shrink-0 mt-0.5" />
-              )}
-              <div className="font-mono text-xs">
-                <div className="text-[#E8E4DE] font-semibold">
-                  {toastNotification.title}
-                </div>
-                <p className="text-[#A7A19A] mt-1 leading-relaxed">
-                  {toastNotification.message}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setToastNotification(null)}
-              aria-label="Dismiss notification"
-              className="text-[#A7A19A] hover:text-[#E8E4DE] p-1 shrink-0"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* MODALS */}
-      <ProjectCaseStudyModal
-        project={selectedProject}
-        onClose={() => setSelectedProject(null)}
-      />
-
-      <VideoPreviewModal
-        video={selectedVideo}
-        onClose={() => setSelectedVideo(null)}
-      />
-
-      <ContactModal
-        isOpen={contactModalOpen}
-        onClose={() => setContactModalOpen(false)}
-      />
-
-      <SecretTerminalModal
-        isOpen={terminalOpen}
-        onClose={() => setTerminalOpen(false)}
-        onOpenArcade={() => {
-          setTerminalOpen(false);
-          setArcadeOpen(true);
-        }}
-        onOpenDungeon={() => {
-          setTerminalOpen(false);
-          setDungeonOpen(true);
-        }}
-      />
-
-      <ArcadeModal
-        isOpen={arcadeOpen}
-        onClose={() => setArcadeOpen(false)}
-        onSwitchToDungeon={() => {
-          setArcadeOpen(false);
-          setDungeonOpen(true);
-        }}
-      />
-
-      <DungeonModal
-        isOpen={dungeonOpen}
-        onClose={() => setDungeonOpen(false)}
-      />
+        <DungeonModal
+          isOpen={dungeonOpen}
+          onClose={() => setDungeonOpen(false)}
+        />
       </div>
     </ThemeProvider>
   );

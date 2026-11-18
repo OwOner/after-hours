@@ -32,7 +32,7 @@ const ARCHITECTURE_LAYERS = [
 
 export default function HeroProductStage({ onExploreWork, onExploreCreative }) {
   const [viewMode, setViewMode] = useState('showcase'); // 'showcase' | 'architecture'
-  const [activeProduct, setActiveProduct] = useState('nexus'); // 'nexus' | 'pos'
+  const [activeProduct, setActiveProduct] = useState('pos'); // 'pos' | 'solar'
   const [activeLayer, setActiveLayer] = useState('ui');
   const prefersReducedMotion = useReducedMotion();
 
@@ -124,10 +124,10 @@ export default function HeroProductStage({ onExploreWork, onExploreCreative }) {
                       duration: MOTION_TOKENS.fast,
                       ease: MOTION_TOKENS.ease,
                     }}
-                    onClick={() => setActiveProduct('nexus')}
-                    aria-pressed={activeProduct === 'nexus'}
+                    onClick={() => setActiveProduct('pos')}
+                    aria-pressed={activeProduct === 'pos'}
                     className={`p-3 text-left border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935] ${
-                      activeProduct === 'nexus'
+                      activeProduct === 'pos'
                         ? 'bg-[#242220] border-[#E87935]'
                         : 'bg-[#101010] border-[#33302D] opacity-75 hover:opacity-100'
                     }`}
@@ -136,10 +136,10 @@ export default function HeroProductStage({ onExploreWork, onExploreCreative }) {
                       FLAGSHIP 01
                     </div>
                     <div className="font-heading text-xs sm:text-sm font-bold text-[#E8E4DE] mt-0.5">
-                      Nexus Payroll
+                      Universal POS
                     </div>
                     <div className="font-mono text-[10px] text-[#A7A19A] mt-0.5">
-                      Next.js • Supabase
+                      Electron • SQLite
                     </div>
                   </motion.button>
 
@@ -150,10 +150,10 @@ export default function HeroProductStage({ onExploreWork, onExploreCreative }) {
                       duration: MOTION_TOKENS.fast,
                       ease: MOTION_TOKENS.ease,
                     }}
-                    onClick={() => setActiveProduct('pos')}
-                    aria-pressed={activeProduct === 'pos'}
+                    onClick={() => setActiveProduct('solar')}
+                    aria-pressed={activeProduct === 'solar'}
                     className={`p-3 text-left border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935] ${
-                      activeProduct === 'pos'
+                      activeProduct === 'solar'
                         ? 'bg-[#242220] border-[#E87935]'
                         : 'bg-[#101010] border-[#33302D] opacity-75 hover:opacity-100'
                     }`}
@@ -162,68 +162,17 @@ export default function HeroProductStage({ onExploreWork, onExploreCreative }) {
                       FLAGSHIP 02
                     </div>
                     <div className="font-heading text-xs sm:text-sm font-bold text-[#E8E4DE] mt-0.5">
-                      Universal POS
+                      Go Green Solar
                     </div>
                     <div className="font-mono text-[10px] text-[#A7A19A] mt-0.5">
-                      Electron • SQLite
+                      React • Solar Energy
                     </div>
                   </motion.button>
                 </div>
 
                 {/* Visual Application Window */}
                 <AnimatePresence mode="wait">
-                  {activeProduct === 'nexus' ? (
-                    <motion.div
-                      key="nexus-panel"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -6 }}
-                      transition={{ duration: 0.22, ease: MOTION_TOKENS.ease }}
-                      className="bg-[#101010] border border-[#33302D] p-3.5 sm:p-4 space-y-4"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#33302D] pb-2.5">
-                        <span className="font-mono text-[11px] text-[#E8E4DE]">
-                          Nexus Payroll — Contribution & Security Ledger
-                        </span>
-                        <span className="font-mono text-[10px] text-[#F3A45B]">
-                          WEB SYSTEM
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-1 xs:grid-cols-3 sm:grid-cols-3 gap-2">
-                        <div className="p-2.5 sm:p-3 bg-[#191919] border border-[#33302D]">
-                          <div className="font-mono text-[9px] text-[#A7A19A]">
-                            DEDUCTIONS
-                          </div>
-                          <div className="font-heading text-xs font-bold text-[#E8E4DE] mt-1">
-                            Automated Rules
-                          </div>
-                        </div>
-                        <div className="p-2.5 sm:p-3 bg-[#191919] border border-[#33302D]">
-                          <div className="font-mono text-[9px] text-[#A7A19A]">
-                            ACCESS
-                          </div>
-                          <div className="font-heading text-xs font-bold text-[#E87935] mt-1">
-                            Role-Gated
-                          </div>
-                        </div>
-                        <div className="p-2.5 sm:p-3 bg-[#191919] border border-[#33302D]">
-                          <div className="font-mono text-[9px] text-[#A7A19A]">
-                            DATABASE
-                          </div>
-                          <div className="font-heading text-xs font-bold text-[#E8E4DE] mt-1">
-                            Postgres / RLS
-                          </div>
-                        </div>
-                      </div>
-
-                      <p className="text-xs text-[#A7A19A] leading-relaxed">
-                        Designed to replace error-prone manual spreadsheets with
-                        structured contribution calculations and database
-                        integrity.
-                      </p>
-                    </motion.div>
-                  ) : (
+                  {activeProduct === 'pos' ? (
                     <motion.div
                       key="pos-panel"
                       initial={{ opacity: 0, y: 8 }}
@@ -272,6 +221,56 @@ export default function HeroProductStage({ onExploreWork, onExploreCreative }) {
                         Built for dependable counter sales management with an
                         embedded local database that works without relying on
                         constant cloud connectivity.
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="solar-panel"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.22, ease: MOTION_TOKENS.ease }}
+                      className="bg-[#101010] border border-[#33302D] p-3.5 sm:p-4 space-y-4"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#33302D] pb-2.5">
+                        <span className="font-mono text-[11px] text-[#E8E4DE]">
+                          Go Green Solar — System Proposal & Simulation
+                        </span>
+                        <span className="font-mono text-[10px] text-[#F3A45B]">
+                          WEB TOOL
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 xs:grid-cols-3 sm:grid-cols-3 gap-2">
+                        <div className="p-2.5 sm:p-3 bg-[#191919] border border-[#33302D]">
+                          <div className="font-mono text-[9px] text-[#A7A19A]">
+                            ARRAYS
+                          </div>
+                          <div className="font-heading text-xs font-bold text-[#E8E4DE] mt-1">
+                            Solar Sizing
+                          </div>
+                        </div>
+                        <div className="p-2.5 sm:p-3 bg-[#191919] border border-[#33302D]">
+                          <div className="font-mono text-[9px] text-[#A7A19A]">
+                            BATTERY
+                          </div>
+                          <div className="font-heading text-xs font-bold text-[#E87935] mt-1">
+                            Storage & Inverter
+                          </div>
+                        </div>
+                        <div className="p-2.5 sm:p-3 bg-[#191919] border border-[#33302D]">
+                          <div className="font-mono text-[9px] text-[#A7A19A]">
+                            LOADS
+                          </div>
+                          <div className="font-heading text-xs font-bold text-[#E8E4DE] mt-1">
+                            Live Home Sim
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-[#A7A19A] leading-relaxed">
+                        Interactive tool for configuring solar components, battery
+                        storage, and estimating household power consumption in real time.
                       </p>
                     </motion.div>
                   )}
@@ -369,13 +368,19 @@ export default function HeroProductStage({ onExploreWork, onExploreCreative }) {
                 </span>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={onExploreCreative}
-              className="font-mono text-[10px] text-[#E87935] hover:text-[#F3A45B] uppercase tracking-wider shrink-0 py-1 px-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
-            >
-              View →
-            </button>
+            {onExploreCreative ? (
+              <button
+                type="button"
+                onClick={onExploreCreative}
+                className="font-mono text-[10px] text-[#E87935] hover:text-[#F3A45B] uppercase tracking-wider shrink-0 py-1 px-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
+              >
+                View →
+              </button>
+            ) : (
+              <span className="font-mono text-[9px] tracking-wider uppercase text-[#A7A19A] border border-[#33302D] px-2 py-0.5 shrink-0">
+                MULTIMEDIA
+              </span>
+            )}
           </div>
         </div>
       </div>

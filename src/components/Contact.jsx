@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { Mail, FileText, Github, Linkedin, ArrowUpRight } from 'lucide-react';
+import { Mail, Github, Linkedin, ArrowUpRight } from 'lucide-react';
 import {
   MOTION_TOKENS,
   createStaggerContainer,
@@ -10,15 +10,8 @@ import { SITE_CONFIG } from '../data/portfolioData.js';
 
 export default function Contact({
   onOpenContactModal,
-  onTriggerResumeDownload,
-  onNotifyUnconfiguredLink,
 }) {
   const prefersReducedMotion = useReducedMotion();
-
-  const handleSocialChannelClick = (platform, url) => {
-    if (url) return; // Handled natively by <a> when configured
-    onNotifyUnconfiguredLink?.(platform);
-  };
 
   return (
     <section
@@ -56,21 +49,6 @@ export default function Contact({
                 <Mail className="w-4 h-4 shrink-0" />
                 <span>CONTACT ME</span>
               </motion.button>
-
-              <motion.button
-                type="button"
-                whileHover={prefersReducedMotion ? undefined : { y: -3 }}
-                whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-                transition={{
-                  duration: MOTION_TOKENS.fast,
-                  ease: MOTION_TOKENS.ease,
-                }}
-                onClick={onTriggerResumeDownload}
-                className="inline-flex items-center justify-center gap-3 px-6 sm:px-7 py-4 bg-[#101010] hover:bg-[#242220] text-[#E8E4DE] border border-[#33302D] hover:border-[#E87935] font-mono text-xs tracking-wider uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
-              >
-                <FileText className="w-4 h-4 text-[#E87935] shrink-0" />
-                <span>DOWNLOAD RESUME</span>
-              </motion.button>
             </div>
           </div>
 
@@ -107,7 +85,7 @@ export default function Contact({
               <ArrowUpRight className="w-4 h-4 text-[#E87935] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </motion.button>
 
-            {SITE_CONFIG.githubUrl ? (
+            {Boolean(SITE_CONFIG.githubUrl) && (
               <motion.a
                 href={SITE_CONFIG.githubUrl}
                 target="_blank"
@@ -133,34 +111,9 @@ export default function Contact({
                 </div>
                 <ArrowUpRight className="w-4 h-4 text-[#E87935] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </motion.a>
-            ) : (
-              <motion.button
-                type="button"
-                variants={createFadeUpVariant(16, 0.45)}
-                whileHover={prefersReducedMotion ? undefined : { x: 4 }}
-                transition={{
-                  duration: MOTION_TOKENS.fast,
-                  ease: MOTION_TOKENS.ease,
-                }}
-                onClick={() => handleSocialChannelClick('GitHub', '')}
-                className="group w-full p-4 bg-[#101010] hover:bg-[#242220] border border-[#33302D] hover:border-[#E87935]/60 transition-colors flex items-center justify-between gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
-              >
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <Github className="w-4 h-4 text-[#E87935] shrink-0" />
-                  <div className="min-w-0">
-                    <div className="font-mono text-[10px] text-[#A7A19A]">
-                      GITHUB
-                    </div>
-                    <div className="font-mono text-xs sm:text-sm text-[#E8E4DE] truncate">
-                      Source repositories & code samples
-                    </div>
-                  </div>
-                </div>
-                <ArrowUpRight className="w-4 h-4 text-[#A7A19A] group-hover:text-[#E87935] shrink-0 transition-colors" />
-              </motion.button>
             )}
 
-            {SITE_CONFIG.linkedinUrl ? (
+            {Boolean(SITE_CONFIG.linkedinUrl) && (
               <motion.a
                 href={SITE_CONFIG.linkedinUrl}
                 target="_blank"
@@ -186,31 +139,6 @@ export default function Contact({
                 </div>
                 <ArrowUpRight className="w-4 h-4 text-[#E87935] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </motion.a>
-            ) : (
-              <motion.button
-                type="button"
-                variants={createFadeUpVariant(16, 0.45)}
-                whileHover={prefersReducedMotion ? undefined : { x: 4 }}
-                transition={{
-                  duration: MOTION_TOKENS.fast,
-                  ease: MOTION_TOKENS.ease,
-                }}
-                onClick={() => handleSocialChannelClick('LinkedIn', '')}
-                className="group w-full p-4 bg-[#101010] hover:bg-[#242220] border border-[#33302D] hover:border-[#E87935]/60 transition-colors flex items-center justify-between gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935]"
-              >
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <Linkedin className="w-4 h-4 text-[#E87935] shrink-0" />
-                  <div className="min-w-0">
-                    <div className="font-mono text-[10px] text-[#A7A19A]">
-                      LINKEDIN
-                    </div>
-                    <div className="font-mono text-xs sm:text-sm text-[#E8E4DE] truncate">
-                      Professional network & profile
-                    </div>
-                  </div>
-                </div>
-                <ArrowUpRight className="w-4 h-4 text-[#A7A19A] group-hover:text-[#E87935] shrink-0 transition-colors" />
-              </motion.button>
             )}
           </motion.div>
         </div>

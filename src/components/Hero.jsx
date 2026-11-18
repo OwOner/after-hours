@@ -129,7 +129,6 @@ export default function Hero({ scrollToSection }) {
           <motion.div variants={heroItemVariants} className="lg:col-span-5">
             <HeroProductStage
               onExploreWork={() => scrollToSection('work')}
-              onExploreCreative={() => scrollToSection('creative')}
             />
           </motion.div>
         </div>

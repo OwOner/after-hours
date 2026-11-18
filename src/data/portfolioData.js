@@ -13,21 +13,175 @@ export const SITE_CONFIG = {
   contactEmailPlaceholder: 'espanojohnpaul28@gmail.com',
   // Formspree submission endpoint (set VITE_FORMSPREE_ENDPOINT in .env / Vercel)
   formspreeEndpoint: import.meta.env.VITE_FORMSPREE_ENDPOINT || '',
+  // Profile photo
+  profilePhotoUrl: import.meta.env.VITE_PROFILE_PHOTO_URL || '/images/jp.jpg',
   // Verified social profile links (configure in .env or here when ready)
   githubUrl: import.meta.env.VITE_GITHUB_URL || '',
-  linkedinUrl: import.meta.env.VITE_LINKEDIN_URL || '',
+  linkedinUrl:
+    import.meta.env.VITE_LINKEDIN_URL ||
+    'https://www.linkedin.com/in/brave-black-bb39143ba/',
   // Set VITE_RESUME_URL="/resume.pdf" in .env once you place resume.pdf inside public/
   resumeUrl: import.meta.env.VITE_RESUME_URL || '',
   resumeSlotPath: 'public/resume.pdf',
   resumeFilename: 'JP_DEV_Resume.pdf',
 };
 
-// --- FOCUSED PROJECT DEFINITIONS (FLAGSHIP + SUPPORTING) ---
+// --- FOCUSED PROJECT DEFINITIONS (DEMONSTRABLE & VISIBLE PROJECTS) ---
 
 export const PROJECTS = [
   {
     id: '01',
+    slug: 'universal-pos',
+    visible: true,
+    tier: 'Desktop Application',
+    title: 'Universal POS',
+    category: 'Desktop Application / Point of Sale',
+    status: 'Completed Application',
+    previewLabel: 'Universal POS Desktop Interface',
+    description:
+      'A standalone, customizable point-of-sale application designed to support different types of businesses.',
+    story:
+      'Retail and counter businesses require fast, dependable checkout systems that operate seamlessly without relying on continuous internet connectivity. Universal POS pairs a modern desktop interface with an embedded local SQLite database for instant transaction processing and reliable inventory management.',
+    overview:
+      'A customizable desktop point-of-sale platform built with Electron, React, TypeScript, and SQLite. Features product browsing across customizable categories, real-time cart handling, inventory-aware item states, and offline-first checkout recording.',
+    architectureNotes: [
+      'Product browsing and categorized item management tailored for diverse business catalogs.',
+      'Real-time cart and order queue handling with rapid item addition and checkout flow.',
+      'Inventory-aware product states indicating in-stock status and service availability.',
+      'Embedded local SQLite database architecture for reliable receipt and transaction recording.',
+    ],
+    highlights: [
+      'Product browsing across item categories',
+      'Real-time cart and checkout interface',
+      'Inventory-aware product states',
+      'Local-first offline SQLite storage',
+    ],
+    technologies: ['Electron', 'React', 'TypeScript', 'SQLite'],
+    previewType: 'pos',
+    screenshotUrl: '/images/projects/universal-pos.png',
+    screenshotSlotPath: 'public/images/projects/universal-pos.png',
+    screenshotAlt:
+      'Universal POS desktop application interface showing product grid, categories, cart management, and checkout interface',
+    demoUrl: '',
+    repoUrl: '',
+  },
+  {
+    id: '02',
+    slug: 'gogreen-solar-simulator',
+    visible: true,
+    tier: 'Web Application',
+    title: 'Go Green Solar Simulator',
+    category: 'Web Application / Solar Energy',
+    status: 'Interactive Tool',
+    previewLabel: 'Go Green Solar Simulator Interface',
+    description:
+      'An interactive solar system proposal and simulation tool for configuring solar components and estimating household power consumption.',
+    story:
+      'Configuring solar setups often leaves clients confused about how panel counts, inverter capacity, and battery storage align with daily appliance use. The Go Green Solar Simulator visualizes these components dynamically, letting users adjust arrays and simulate live household loads before installation.',
+    overview:
+      'An interactive solar proposal and simulation tool for modeling hybrid solar systems. Built with confirmed web technologies, it features dynamic solar array sizing, battery storage tracking, inverter data, and real-time household appliance load simulation.',
+    architectureNotes: [
+      'Solar array configuration supporting panel wattage ratings and dynamic count adjustments.',
+      'Battery storage and hybrid inverter status simulation with live grid and backup metrics.',
+      'Live home load simulation calculating real-time power consumption across individual appliances.',
+      'Interactive electrical flow diagram visualizing generation, storage, and consumption.',
+    ],
+    highlights: [
+      'Solar array configuration & panel count sizing',
+      'Battery storage & hybrid inverter simulation',
+      'Live household load & appliance power calculation',
+      'Dynamic electrical generation & consumption flow diagram',
+    ],
+    technologies: ['React', 'TypeScript', 'Tailwind CSS'],
+    previewType: 'solar',
+    screenshotUrl: '/images/projects/go-green-solar.png',
+    screenshotSlotPath: 'public/images/projects/go-green-solar.png',
+    screenshotAlt:
+      'Go Green Solar Simulator web interface showing solar array configuration, inverter metrics, and live home load simulation',
+    demoUrl: '',
+    repoUrl: '',
+  },
+  {
+    id: '03',
+    slug: '151-street-cafe-pos',
+    visible: true,
+    tier: 'Café Operations Suite',
+    title: '151 Street Café POS',
+    category: 'Web Application / Point of Sale',
+    status: 'Operational System',
+    previewLabel: 'Cashier Point-of-Sale System Specimen',
+    description:
+      'A cashier-facing point-of-sale system for managing café orders and transactions.',
+    story:
+      'Developed specifically for 151 Street Café as part of their integrated digital suite. Built to streamline counter operations during peak service hours with rapid menu navigation and clear ticket handling.',
+    overview:
+      'A cashier-facing web point-of-sale system designed for fast café counter workflows. Features organized menu browsing with hot and iced drink variations, multi-channel order creation (dine-in, takeout, pickup, delivery), and active ticket tracking.',
+    architectureNotes: [
+      'Fast counter menu browsing with categorized beverage and food items.',
+      'Order creation supporting multiple order types: dine-in, takeout, pickup, and delivery.',
+      'Active ticket management with real-time running totals and open tab tracking.',
+      'Cashier workflow optimized for rapid order punching and shift management.',
+    ],
+    highlights: [
+      'Menu browsing & categorized item variations',
+      'Order creation across 4 order types (dine-in, takeout, pickup, delivery)',
+      'Active ticket queue & running open tabs',
+      'Optimized rapid cashier workflow',
+      'Part of 151 Street Café digital suite',
+    ],
+    technologies: ['React', 'TypeScript', 'Tailwind CSS'],
+    previewType: 'cafe-pos',
+    cafeSuite: '151 Street Café Digital Suite — Component 01: In-Store Cashier POS',
+    screenshotUrl: '/images/projects/151-cafe-pos.png',
+    screenshotSlotPath: 'public/images/projects/151-cafe-pos.png',
+    screenshotAlt:
+      '151 Street Café POS cashier counter terminal interface showing beverage menu categories, active ticket queue, and order types',
+    demoUrl: '',
+    repoUrl: '',
+  },
+  {
+    id: '04',
+    slug: '151-street-cafe-website',
+    visible: true,
+    tier: 'Brand & Public Web',
+    title: '151 Street Café Website',
+    category: 'Web Development',
+    status: 'Public Platform',
+    previewLabel: '151 Street Café Public Website',
+    description:
+      'A public-facing café website presenting its menu, brand, gallery, reservations, and customer information.',
+    story:
+      'The public counterpart to 151 Street Café’s operational systems. Crafted to showcase the café’s artisanal coffee culture, single-origin roasts, and warm physical space in Sorsogon City while providing customer reservation entry points.',
+    overview:
+      'A responsive brand website delivering an editorial coffee experience. Presents artisanal coffee tasting notes, culinary menus, customer table reservations, visit details, and online ordering entry points.',
+    architectureNotes: [
+      'Brand storytelling and coffee origin presentation highlighting artisanal brewing.',
+      'Interactive menu showcase featuring specialty coffee, cold drinks, and food selections.',
+      'Online customer reservation interface for booking tables and scheduling visits.',
+      'Customer guidance with store hours, physical location details, and order-ahead links.',
+    ],
+    highlights: [
+      'Artisanal coffee brand storytelling',
+      'Interactive menu & tasting notes showcase',
+      'Customer table reservation interface',
+      'Visit guidance & order-ahead entry points',
+      'Part of 151 Street Café digital suite',
+    ],
+    technologies: ['React', 'Tailwind CSS'],
+    previewType: 'cafe-web',
+    cafeSuite: '151 Street Café Digital Suite — Component 02: Public Brand Website',
+    screenshotUrl: '/images/projects/151-cafe-website.png',
+    screenshotSlotPath: 'public/images/projects/151-cafe-website.png',
+    screenshotAlt:
+      '151 Street Café public website homepage showing brand presentation, Single Origin Ethiopia Yirgacheffe roast, and menu navigation',
+    demoUrl: '',
+    repoUrl: '',
+  },
+  // --- TEMPORARILY HIDDEN PROJECTS (PRESERVED INTACT) ---
+  {
+    id: '05',
     slug: 'nexus-payroll',
+    visible: false, // Hidden from public showcase — restore by changing to true
     tier: 'Flagship System',
     title: 'Nexus Payroll',
     category: 'Enterprise Payroll System',
@@ -55,37 +209,9 @@ export const PROJECTS = [
     repoUrl: import.meta.env.VITE_NEXUS_REPO_URL || '',
   },
   {
-    id: '02',
-    slug: 'universal-pos',
-    tier: 'Flagship Application',
-    title: 'Universal POS',
-    category: 'Desktop Point-of-Sale',
-    status: 'Functional Prototype',
-    previewLabel: 'Conceptual Product Preview — Replace with Desktop Screenshot',
-    description:
-      'Customizable desktop point-of-sale application focused on sales management and local database architecture.',
-    story:
-      'Retail and counter environments require fast, dependable checkout operations that do not stall when internet connectivity fluctuates. Universal POS pairs an Electron desktop interface with an embedded SQLite database for immediate local transaction processing.',
-    overview:
-      'A desktop point-of-sale application built around an embedded local SQLite database for reliable transaction recording and customizable catalog workflows.',
-    architectureNotes: [
-      'Cross-platform desktop shell powered by Electron with a responsive React interface.',
-      'Local-first SQLite persistence layer designed for direct product lookup and transaction logging.',
-      'Modular item catalog and order queue tailored for rapid counter operations.',
-    ],
-    technologies: ['Electron', 'React', 'SQLite', 'TypeScript'],
-    previewType: 'pos',
-    // Set VITE_POS_SCREENSHOT_URL="/assets/projects/universal-pos.png" in .env once image is placed in public/
-    screenshotUrl: import.meta.env.VITE_POS_SCREENSHOT_URL || '',
-    screenshotSlotPath: 'public/assets/projects/universal-pos.png',
-    screenshotAlt:
-      'Universal POS desktop counter terminal interface with item grid and SQLite receipt ledger',
-    demoUrl: import.meta.env.VITE_POS_DEMO_URL || '',
-    repoUrl: import.meta.env.VITE_POS_REPO_URL || '',
-  },
-  {
-    id: '03',
+    id: '06',
     slug: 'smartspend',
+    visible: false, // Hidden from public showcase — restore by changing to true
     tier: 'Supporting Application',
     title: 'SmartSpend',
     category: 'Personal Finance Application',

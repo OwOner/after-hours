@@ -7,6 +7,7 @@ import {
   MODAL_PANEL_VARIANTS,
 } from '../../utils/motion.jsx';
 import { useModalAccessibility } from '../../hooks/useModalAccessibility.js';
+import { PROJECTS } from '../../data/portfolioData.js';
 
 const QUICK_COMMANDS = [
   'help',
@@ -77,16 +78,19 @@ export default function SecretTerminalModal({
           text: 'JP.DEV — Software, Web & Application Developer based in Sorsogon, Philippines. Experienced across full-stack development, local/cloud databases, and video editing.',
         });
         break;
-      case 'projects':
+      case 'projects': {
+        const visibleList = PROJECTS.filter((p) => p.visible !== false)
+          .map(
+            (p, i) =>
+              `0${i + 1}. ${p.title} (${p.technologies.join(', ')}) — ${p.tier}`,
+          )
+          .join('\n');
         newLogs.push({
           type: 'output',
-          text: [
-            '01. Nexus Payroll  (Next.js, TypeScript, Supabase) — Flagship',
-            '02. Universal POS  (Electron, React, SQLite, TypeScript) — Flagship',
-            '03. SmartSpend     (React, TypeScript, Supabase) — Supporting',
-          ].join('\n'),
+          text: visibleList,
         });
         break;
+      }
       case 'status':
         newLogs.push({
           type: 'output',

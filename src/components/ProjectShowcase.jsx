@@ -6,6 +6,7 @@ import ProjectStageCanvas from './ProjectStageCanvas.jsx';
 
 export default function ProjectShowcase({ onSelectProject }) {
   const prefersReducedMotion = useReducedMotion();
+  const visibleProjects = PROJECTS.filter((project) => project.visible !== false);
 
   return (
     <section
@@ -24,16 +25,17 @@ export default function ProjectShowcase({ onSelectProject }) {
           </h2>
         </div>
         <p className="text-[#A7A19A] text-base sm:text-lg max-w-md">
-          Flagship applications and systems I've built, presented with
-          conceptual interface previews and system breakdowns.
+          Completed applications and digital platforms I've built, presented with
+          application screenshots, architecture breakdowns, and system specifications.
         </p>
       </Reveal>
 
       {/* Full-Width Editorial Showcases with Generous Breathing Room */}
       <div className="space-y-20 sm:space-y-28 md:space-y-36">
-        {PROJECTS.map((project, index) => {
-          const isFlagship = index < 2;
+        {visibleProjects.map((project, index) => {
+          const isScreenshotProject = Boolean(project.screenshotUrl);
           const isEven = index % 2 === 1;
+          const displayId = String(index + 1).padStart(2, '0');
           return (
             <Reveal key={project.id} amount={0.12}>
               <motion.article
@@ -50,11 +52,16 @@ export default function ProjectShowcase({ onSelectProject }) {
                 <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
                   <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                     <span className="font-mono text-xs px-3 py-1 bg-[#E87935] text-[#101010] font-bold tracking-wider uppercase">
-                      PROJECT {project.id}
+                      PROJECT {displayId}
                     </span>
                     <span className="font-mono text-xs text-[#F3A45B] uppercase tracking-wider">
                       {project.tier}
                     </span>
+                    {project.cafeSuite && (
+                      <span className="font-mono text-[10px] px-2.5 py-0.5 bg-[#161514] border border-[#33302D] text-[#A7A19A] uppercase tracking-wider">
+                        151 STREET CAFÉ SUITE
+                      </span>
+                    )}
                   </div>
                   <span className="font-mono text-[11px] sm:text-xs px-3 py-1 bg-[#191919] border border-[#33302D] group-hover:border-[#E87935]/40 transition-colors text-[#A7A19A]">
                     Status: {project.status}
@@ -64,9 +71,8 @@ export default function ProjectShowcase({ onSelectProject }) {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-14 items-start">
                   {/* Project Narrative & Storytelling Column */}
                   <div
-                    className={`lg:col-span-5 space-y-5 sm:space-y-6 ${
-                      isEven ? 'lg:order-2' : 'lg:order-1'
-                    }`}
+                    className={`lg:col-span-5 space-y-5 sm:space-y-6 ${isEven ? 'lg:order-2' : 'lg:order-1'
+                      }`}
                   >
                     <div>
                       <div className="font-mono text-xs tracking-widest text-[#A7A19A] uppercase mb-2">
@@ -91,15 +97,17 @@ export default function ProjectShowcase({ onSelectProject }) {
                         System Highlights
                       </div>
                       <ul className="space-y-1.5">
-                        {project.architectureNotes.map((note, nIdx) => (
-                          <li
-                            key={nIdx}
-                            className="text-xs sm:text-sm text-[#A7A19A] flex items-start gap-2"
-                          >
-                            <span className="text-[#E87935] font-mono">›</span>
-                            <span>{note}</span>
-                          </li>
-                        ))}
+                        {(project.highlights || project.architectureNotes).map(
+                          (highlight, hIdx) => (
+                            <li
+                              key={hIdx}
+                              className="text-xs sm:text-sm text-[#A7A19A] flex items-start gap-2"
+                            >
+                              <span className="text-[#E87935] font-mono">›</span>
+                              <span>{highlight}</span>
+                            </li>
+                          ),
+                        )}
                       </ul>
                     </div>
 
@@ -120,7 +128,7 @@ export default function ProjectShowcase({ onSelectProject }) {
                       </div>
                     </div>
 
-                    {/* Case Study Trigger & Optional External Links */}
+                    {/* Case Study Trigger & Confirmed External Links */}
                     <div className="pt-3 sm:pt-4 flex flex-wrap items-center gap-3">
                       <motion.button
                         type="button"
@@ -140,7 +148,7 @@ export default function ProjectShowcase({ onSelectProject }) {
                         <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                       </motion.button>
 
-                      {project.demoUrl && (
+                      {Boolean(project.demoUrl) && (
                         <a
                           href={project.demoUrl}
                           target="_blank"
@@ -152,7 +160,7 @@ export default function ProjectShowcase({ onSelectProject }) {
                         </a>
                       )}
 
-                      {project.repoUrl && (
+                      {Boolean(project.repoUrl) && (
                         <a
                           href={project.repoUrl}
                           target="_blank"
@@ -178,9 +186,8 @@ export default function ProjectShowcase({ onSelectProject }) {
                         onSelectProject(project);
                       }
                     }}
-                    className={`lg:col-span-7 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935] ${
-                      isEven ? 'lg:order-1' : 'lg:order-2'
-                    }`}
+                    className={`lg:col-span-7 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E87935] ${isEven ? 'lg:order-1' : 'lg:order-2'
+                      }`}
                   >
                     <div className="relative bg-[#191919] border border-[#33302D] group-hover:border-[#E87935]/70 p-2.5 sm:p-4 transition-colors duration-300 shadow-2xl">
                       {/* Subtle Corner Accents */}
@@ -190,11 +197,10 @@ export default function ProjectShowcase({ onSelectProject }) {
                       <span className="pointer-events-none absolute bottom-0 right-0 w-2.5 h-2.5 border-b-2 border-r-2 border-[#E87935] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                       <div
-                        className={`${
-                          isFlagship
-                            ? 'min-h-[340px] sm:min-h-[420px]'
-                            : 'min-h-[280px] sm:min-h-[340px]'
-                        } w-full border border-[#33302D] overflow-hidden flex flex-col`}
+                        className={`${isScreenshotProject
+                          ? 'min-h-[340px] sm:min-h-[420px]'
+                          : 'min-h-[300px] sm:min-h-[380px]'
+                          } w-full border border-[#33302D] overflow-hidden flex flex-col`}
                       >
                         <motion.div
                           whileHover={

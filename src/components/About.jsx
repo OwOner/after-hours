@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   MOTION_TOKENS,
@@ -5,9 +6,12 @@ import {
   createFadeUpVariant,
   Reveal,
 } from '../utils/motion.jsx';
+import { SITE_CONFIG } from '../data/portfolioData.js';
 
 export default function About() {
   const prefersReducedMotion = useReducedMotion();
+  const [photoError, setPhotoError] = useState(false);
+  const photoUrl = SITE_CONFIG.profilePhotoUrl || '/images/jp.jpg';
 
   return (
     <section
@@ -27,41 +31,80 @@ export default function About() {
             </h2>
           </div>
 
-          {/* Restrained Dark Editorial Portrait Placeholder */}
+          {/* Restrained Dark Editorial Portrait */}
           <motion.div
             whileHover={prefersReducedMotion ? undefined : { y: -3 }}
             transition={{
               duration: MOTION_TOKENS.standard,
               ease: MOTION_TOKENS.ease,
             }}
-            className="bg-[#191919] border border-[#33302D] hover:border-[#E87935]/50 transition-colors p-4 sm:p-5"
+            className="group relative bg-[#191919] border border-[#33302D] hover:border-[#E87935]/50 transition-colors p-3.5 sm:p-4 shadow-2xl"
           >
-            <div className="aspect-[4/3] bg-[#101010] border border-[#33302D] p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden">
-              <div className="flex justify-between items-center font-mono text-[10px] text-[#A7A19A]">
-                <span>DEVELOPER MONOGRAM</span>
-                <span className="text-[#E87935]">JP.DEV</span>
-              </div>
+            {/* Subtle Technical Corner Accents */}
+            <span className="pointer-events-none absolute top-0 left-0 w-2.5 h-2.5 border-t-2 border-l-2 border-[#E87935] opacity-60 group-hover:opacity-100 transition-opacity" />
+            <span className="pointer-events-none absolute top-0 right-0 w-2.5 h-2.5 border-t-2 border-r-2 border-[#E87935] opacity-60 group-hover:opacity-100 transition-opacity" />
+            <span className="pointer-events-none absolute bottom-0 left-0 w-2.5 h-2.5 border-b-2 border-l-2 border-[#E87935] opacity-60 group-hover:opacity-100 transition-opacity" />
+            <span className="pointer-events-none absolute bottom-0 right-0 w-2.5 h-2.5 border-b-2 border-r-2 border-[#E87935] opacity-60 group-hover:opacity-100 transition-opacity" />
 
-              {/* Minimalist Monogram Emblem */}
-              <div className="my-auto flex flex-col items-center justify-center text-center py-4">
-                <motion.div
-                  whileHover={prefersReducedMotion ? undefined : { rotate: 135 }}
-                  transition={{ duration: 0.45, ease: MOTION_TOKENS.ease }}
-                  className="w-14 h-14 sm:w-16 sm:h-16 border border-[#E87935]/60 bg-[#191919] flex items-center justify-center rotate-45 mb-4"
-                >
-                  <span className="font-heading text-base sm:text-lg font-bold text-[#E8E4DE] -rotate-45">
-                    JP
+            {/* Top Specification Strip */}
+            <div className="flex items-center justify-between font-mono text-[10px] text-[#A7A19A] border-b border-[#33302D] pb-2.5 mb-3">
+              <span className="tracking-wider text-[#E87935]">PROFILE // PORTRAIT</span>
+              <span className="text-[#A7A19A]">JP.DEV</span>
+            </div>
+
+            {/* Portrait Photo Container */}
+            {!photoError ? (
+              <div className="relative aspect-[4/5] w-full bg-[#101010] border border-[#33302D] overflow-hidden">
+                <img
+                  src={photoUrl}
+                  alt="John Paul - Software Developer"
+                  loading="lazy"
+                  decoding="async"
+                  onError={() => setPhotoError(true)}
+                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#101010]/85 via-transparent to-transparent pointer-events-none" />
+
+                {/* In-Frame Status Tag */}
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between font-mono text-[9px] text-[#E8E4DE] bg-[#101010]/85 backdrop-blur-sm border border-[#33302D] px-2.5 py-1.5">
+                  <span className="text-[#F3A45B] tracking-wider uppercase">JOHN PAUL</span>
+                  <span className="text-[#A7A19A]">BSCS • SORSOGON</span>
+                </div>
+              </div>
+            ) : (
+              <div className="aspect-[4/3] bg-[#101010] border border-[#33302D] p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden">
+                <div className="flex justify-between items-center font-mono text-[10px] text-[#A7A19A]">
+                  <span>DEVELOPER MONOGRAM</span>
+                  <span className="text-[#E87935]">JP.DEV</span>
+                </div>
+
+                {/* Minimalist Monogram Emblem */}
+                <div className="my-auto flex flex-col items-center justify-center text-center py-4">
+                  <motion.div
+                    whileHover={prefersReducedMotion ? undefined : { rotate: 135 }}
+                    transition={{ duration: 0.45, ease: MOTION_TOKENS.ease }}
+                    className="w-14 h-14 sm:w-16 sm:h-16 border border-[#E87935]/60 bg-[#191919] flex items-center justify-center rotate-45 mb-4"
+                  >
+                    <span className="font-heading text-base sm:text-lg font-bold text-[#E8E4DE] -rotate-45">
+                      JP
+                    </span>
+                  </motion.div>
+                  <span className="font-mono text-[10px] sm:text-[11px] text-[#E8E4DE] tracking-widest uppercase">
+                    Software & Multimedia Developer
                   </span>
-                </motion.div>
-                <span className="font-mono text-[10px] sm:text-[11px] text-[#E8E4DE] tracking-widest uppercase">
-                  Software & Multimedia Developer
-                </span>
-              </div>
+                </div>
 
-              <div className="flex justify-between font-mono text-[10px] text-[#A7A19A] border-t border-[#33302D] pt-3">
-                <span>SORSOGON, PH</span>
-                <span className="text-[#F3A45B]">WEB • DESKTOP • MEDIA</span>
+                <div className="flex justify-between font-mono text-[10px] text-[#A7A19A] border-t border-[#33302D] pt-3">
+                  <span>SORSOGON, PH</span>
+                  <span className="text-[#F3A45B]">WEB • DESKTOP • MEDIA</span>
+                </div>
               </div>
+            )}
+
+            {/* Bottom Metadata Ledger */}
+            <div className="flex justify-between items-center font-mono text-[10px] text-[#A7A19A] pt-3 mt-3 border-t border-[#33302D]">
+              <span className="text-[#E8E4DE]">SOFTWARE & MULTIMEDIA</span>
+              <span className="text-[#E87935]">AFTERHOURS</span>
             </div>
           </motion.div>
         </Reveal>
